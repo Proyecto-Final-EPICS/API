@@ -3,3 +3,6 @@ Este repositorio contiene la configuración básica de la api dispuesta para con
 
 El repositorio usado como referencia de la estructura base inicial que tuvo el proyecto es: 
 https://github.com/ashutosh1919/flask_mongodb_dockerized_app.git 
+
+Pueden acceder a la API REST a travez de la siguiente URL:
+https://vip-epics-dev.herokuapp.com
