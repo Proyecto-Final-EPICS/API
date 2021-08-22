@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./app/Dockerfile
+    command: python -u app.py
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app:/app
+    links:
+      - mongo
+  mongo:
+    build:
+      context: .
+      dockerfile: ./mongo/Dockerfile
+    environment:
+      MONGO_INITDB_DATABASE: cody_db
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo/data:/data/db
+      #next is the test data
+      - ./mongo/basicStructure/init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
