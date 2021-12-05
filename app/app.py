@@ -21,13 +21,13 @@ api = Api(app)
 jwt = JWTManager(app)
 app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(days=1)
+
 api.add_resource(Admin, '/admin')
 api.add_resource(Professor, '/professor')
 api.add_resource(School, '/school')
 api.add_resource(Student, '/student')
 api.add_resource(Game, '/detailsGame')
 api.add_resource(SessionGame, '/sessionGame')
-
 api.add_resource(BasicSchool, '/getSchools')
 api.add_resource(StudentLogin, '/login')
 api.add_resource(SchoolToProfessor, '/professorSchool')
