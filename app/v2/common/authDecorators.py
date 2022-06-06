@@ -16,18 +16,6 @@ def auth_required(l:list):
         return decorator
     return wraper
 
-# def role_superior():
-#     def decorator(*args, **kwargs):
-#         role_required('>', *args, **kwargs)
-    
-#     return decorator
-
-# def role_superior_or_equal():
-#     def decorator(*args, **kwargs):
-#         role_required('>=', *args, **kwargs)
-    
-#     return decorator
-
 def self_allowed():
     def wrapper(fn):
         @wraps(fn)
