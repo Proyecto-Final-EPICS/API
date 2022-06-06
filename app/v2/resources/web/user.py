@@ -81,5 +81,32 @@ def post_user(content):
 
     except Role.DoesNotExist: return jsonify(msg='Invalid role')
 
-def delete_user():
-    pass
+def delete_user(content):
+
+    @greater_than()
+    def with_role(content, user):
+        try:
+            if(user.role == 'student'):
+                elem = Student.objects.get(username=content['username'])
+            elif(user.role == 'professor'):
+                elem = Professor.objects.get(username=content['username'])
+            elif(user.role == 'rector'):
+                elem = Rector.objects.get(username=content['username'])
+            else: return {'msg': 'User to delete must be either a student, a professor or a rector'}
+
+            user.delete()
+            elem.delete()
+
+            return {'msg': 'Successful operation'}
+            # return {'users': jsonify(User.objects)}
+
+        except (Student.DoesNotExist, Professor.DoesNotExist, Rector.DoesNotExist):
+            return {'msg': 'Unexpected error'}
+
+    try:
+        user = User.objects.get(username=content['username'])
+        content['role'] = user.role
+        return with_role(content, user)
+
+    except User.DoesNotExist: return {'msg': 'Non existing user'}
+

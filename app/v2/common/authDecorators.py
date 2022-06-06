@@ -24,8 +24,6 @@ def greater_than():
             try:
                 verify_jwt_in_request()
                 claims = get_jwt()
-                print(claims)
-                print(content)
                 role_claims = Role.objects.get(name=claims['sub']['role'])
                 role_content = Role.objects.get(name=content['role'])
 
