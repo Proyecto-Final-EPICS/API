@@ -38,10 +38,22 @@ def delSchool(id):
 def login():
     return user.login(request.get_json())
 
+@app.route('/user')
+def get_users():
+    return user.get_users()
+
+@app.route('/user/<username>')
+def get_user(username):
+    return user.get_user(username)
+
 @app.route('/user', methods=['POST'])
 def post_user():
     return user.post_user(request.get_json())
 
-@app.route('/user', methods=['DELETE'])
-def delete_user():
-    return user.delete_user(request.get_json())
+@app.route('/user/<username>', methods=['DELETE'])
+def delete_user(username):
+    return user.delete_user(username)
+
+@app.route('/user/<username>', methods=['PUT'])
+def put_user(username):
+    return user.put_user(username, request.get_json())
