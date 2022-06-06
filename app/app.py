@@ -16,7 +16,7 @@ app.register_blueprint(v1)
 app.register_blueprint(v2, url_prefix='/v2.0')
 
 if __name__ == '__main__':
-    port = os.getenv('PORT', 5000)
+    port = os.getenv('PORT', 8000)
     debug = os.getenv('DEBUG', True)
     # print(os.getenv('DB_URL', 'hola'))
     app.run(host="0.0.0.0", port=port, debug=debug)
