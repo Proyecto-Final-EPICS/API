@@ -23,6 +23,25 @@ def login(content):
 
     return jsonify(result)
 
+def get_user(username):
+    try:
+        user = User.objects.get(username=username)
+        if user.role == 'student':
+            elem = Student.objects.get(username=username)
+        elif user.role == 'professor':
+            elem = Professor.objects.get(username=username)
+        elif user.role == 'rector':
+            elem = Rector.objects.get(username=username)
+        elif user.role == 'admin':
+            elem = Admin.objects.get(username=username)
+
+        return {user: user.to_json(), user.role: elem.to_json()}
+        
+    except User.DoesNotExist:
+        return {'msg': 'User does not exist'} 
+    except (Student.DoesNotExist, Professor.DoesNotExist, Rector.DoesNotExist, Admin.DoesNotExist):
+            return {'msg': 'Unexpected error'} 
+
 @role_required('>')
 def post_user(content):
     # Role.objects.get(name=role)
@@ -109,14 +128,12 @@ def delete_user(content):
 
     except User.DoesNotExist: return {'msg': 'Non existing user'}
 
-# @self_allowed()
-def put_user(content):
+def put_user(username, content):
 
     @role_required('>')
     def with_role(content, user):
         try:
             role = user.role
-            username = user.username
 
             if(role == 'student'):
                 elem = Student.objects.get(username=username)
@@ -162,7 +179,7 @@ def put_user(content):
             return {'msg': 'Some fields required as unique are repeated'}
 
     try:
-        user = User.objects.get(username=content['username'])
+        user = User.objects.get(username=username)
         content['role'] = user.role
         return with_role(content, user)
     except User.DoesNotExist:

@@ -12,6 +12,11 @@ def root():
 def login():
     return user.login(request.get_json())
 
+
+@app.route('/user/<username>', methods=['PUT'])
+def get_user(username):
+    return user.get_user(username)
+
 @app.route('/user', methods=['POST'])
 def post_user():
     return user.post_user(request.get_json())
@@ -20,6 +25,6 @@ def post_user():
 def delete_user():
     return user.delete_user(request.get_json())
 
-@app.route('/user', methods=['PUT'])
-def put_user():
-    return user.put_user(request.get_json())
+@app.route('/user/<username>', methods=['PUT'])
+def put_user(username):
+    return user.put_user(username, request.get_json())
