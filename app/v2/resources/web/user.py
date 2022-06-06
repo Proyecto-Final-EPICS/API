@@ -7,22 +7,32 @@ from mongoengine import NotUniqueError, ValidationError
 def login(content):
     result = {}
 
-    def query(collection):
-        user = collection.objects.get(username=content['username'], password=content['password'])
+    try:
+        user = User.objects.get(username=content['username'], password=content['password'])
         result['token'] = create_access_token({
             'username': user.username,
             'firstname': user.firstname,
             'lastname': user.lastname,
-            'role': user.role if collection == User else 'admin'
+            'role': user.role
         })
-    
-    try: query(User)
     except User.DoesNotExist:
-        try: query(Admin)
-        except Admin.DoesNotExist: result['token'] = None
+        result['token'] = None
 
-    return jsonify(result)
+    # return jsonify(result)
+    return result
 
+def get_users():
+
+    # return User.objects.to_json()
+
+    return {
+        'user': User.objects.to_json(),
+        'admin': Admin.objects.to_json(),
+        'rector': Rector.objects.to_json(),
+        'professor': Professor.objects.to_json(),
+        'student': Student.objects.to_json(),
+    }
+    
 def get_user(username):
     try:
         user = User.objects.get(username=username)
@@ -44,7 +54,6 @@ def get_user(username):
 
 @role_required('>')
 def post_user(content):
-    # Role.objects.get(name=role)
     role = content['role']
     username = content['username']
     
@@ -82,7 +91,7 @@ def post_user(content):
                 id_school=id_school, identity_doc=identity_doc, birth_date=birth_date,
                 # phone=content['phone'], email=content['email'],
             )
-        else: return {'msg': 'User to delete must be either a student, a professor or a rector'}
+        else: return {'msg': 'User to post must be either a student, a professor or a rector'}
         
         try:
             user.validate()
@@ -97,33 +106,31 @@ def post_user(content):
 
         return {'user': user, role: elem}
 
-    # except Role.DoesNotExist: return jsonify(msg='Invalid role')
-
-def delete_user(content):
+def delete_user(username):
 
     @role_required('>')
     def with_role(content, user):
         try:
-            if(user.role == 'student'):
-                elem = Student.objects.get(username=content['username'])
-            elif(user.role == 'professor'):
-                elem = Professor.objects.get(username=content['username'])
-            elif(user.role == 'rector'):
-                elem = Rector.objects.get(username=content['username'])
+            if(content['role'] == 'student'):
+                elem = Student.objects.get(username=username)
+            elif(content['role'] == 'professor'):
+                elem = Professor.objects.get(username=username)
+            elif(content['role'] == 'rector'):
+                elem = Rector.objects.get(username=username)
             else: return {'msg': 'User to delete must be either a student, a professor or a rector'}
 
             user.delete()
             elem.delete()
 
-            return {'msg': 'Successful operation'}
-            # return {'users': jsonify(User.objects)}
+            # return {'msg': 'Successful operation'}
+            return User.objects.to_json()
 
         except (Student.DoesNotExist, Professor.DoesNotExist, Rector.DoesNotExist):
             return {'msg': 'Unexpected error'}
 
     try:
-        user = User.objects.get(username=content['username'])
-        content['role'] = user.role
+        user = User.objects.get(username=username)
+        content = {'role': user.role}
         return with_role(content, user)
 
     except User.DoesNotExist: return {'msg': 'Non existing user'}
