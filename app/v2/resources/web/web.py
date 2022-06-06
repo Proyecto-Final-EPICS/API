@@ -12,7 +12,7 @@ def root():
 def login():
     return auth(request.get_json())
 
-@app.route('/register/<string:role>', methods=['POST'])
-def reg_user():
+@app.route('/register', methods=['POST'])
+def register():
     content = request.get_json()
     return ''
