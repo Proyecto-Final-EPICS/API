@@ -35,7 +35,7 @@ def get_user(username):
         elif user.role == 'admin':
             elem = Admin.objects.get(username=username)
 
-        return {user: user.to_json(), user.role: elem.to_json()}
+        return {'user': user, user.role: elem}
         
     except User.DoesNotExist:
         return {'msg': 'User does not exist'} 
@@ -133,7 +133,7 @@ def put_user(username, content):
     @role_required('>')
     def with_role(content, user):
         try:
-            role = user.role
+            role = content['role']
 
             if(role == 'student'):
                 elem = Student.objects.get(username=username)
@@ -143,7 +143,7 @@ def put_user(username, content):
                 elem = Rector.objects.get(username=username)
             else: return {'msg': 'User to modify must be either a student, a professor or a rector'}
 
-            username_mod = content['username_mod']
+            username_mod = content['username']
             password = content['password']
             firstname = content['firstname']
             lastname = content['lastname']
@@ -182,5 +182,6 @@ def put_user(username, content):
         user = User.objects.get(username=username)
         content['role'] = user.role
         return with_role(content, user)
+
     except User.DoesNotExist:
-        pass
+        return {'msg': 'User does not exist'}

@@ -43,8 +43,11 @@ def role_required(rel):
                 verify_jwt_in_request()
                 claims = get_jwt()
 
+                print('***************************************************************************')
                 role_claims = Role.objects.get(name=claims['sub']['role'])
+                print('***************************************************************************')
                 role_content = Role.objects.get(name=content['role'])
+                print('***************************************************************************')
 
                 if rel == '>':
                     if role_claims.permission_level < role_content.permission_level:

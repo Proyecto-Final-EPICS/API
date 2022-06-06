@@ -13,7 +13,7 @@ def login():
     return user.login(request.get_json())
 
 
-@app.route('/user/<username>', methods=['PUT'])
+@app.route('/user/<username>')
 def get_user(username):
     return user.get_user(username)
 
