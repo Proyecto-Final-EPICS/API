@@ -1,7 +1,7 @@
-from v2.models import Role, User, Admin, Student, Professor, Rector
+from v2.models import User, Admin, Student, Professor, Rector
 from flask_jwt_extended import create_access_token
 from flask import jsonify
-from v2.common.authDecorators import role_required, self_allowed
+from v2.common.authDecorators import role_permission_required
 from mongoengine import NotUniqueError, ValidationError
 
 def login(content):
@@ -18,7 +18,6 @@ def login(content):
     except User.DoesNotExist:
         result['token'] = None
 
-    # return jsonify(result)
     return result
 
 def get_users():
@@ -52,14 +51,14 @@ def get_user(username):
     except (Student.DoesNotExist, Professor.DoesNotExist, Rector.DoesNotExist, Admin.DoesNotExist):
             return {'msg': 'Unexpected error'} 
 
-@role_required('>')
+@role_permission_required('>')
 def post_user(content):
     role = content['role']
     username = content['username']
     
     try:
         User.objects.get(username=username)
-        return jsonify(msg='User already exists')
+        return {'msg': 'User already exists'}
     except User.DoesNotExist:
         password = content['password']
         firstname = content['firstname']
@@ -108,7 +107,7 @@ def post_user(content):
 
 def delete_user(username):
 
-    @role_required('>')
+    @role_permission_required('>')
     def with_role(content, user):
         try:
             if(content['role'] == 'student'):
@@ -137,7 +136,7 @@ def delete_user(username):
 
 def put_user(username, content):
 
-    @role_required('>')
+    @role_permission_required('>')
     def with_role(content, user):
         try:
             role = content['role']
