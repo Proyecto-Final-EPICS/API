@@ -11,5 +11,7 @@ def get_db():
     #                      password='pass',
     #                      authSource="admin")
     # db = client["cody_db"]
-    client = MongoClient(os.getenv('DB_URL', 'http://localhost:27017'))
-    return client.cody_db
+    # print(os.getenv('DB_URL1', None))
+    # print(os.getenv('DB_NAME1', None))
+    client = MongoClient(os.getenv('DB_URL1', 'http://localhost:27017'))
+    return client.get_database(os.getenv('DB_NAME1', None))

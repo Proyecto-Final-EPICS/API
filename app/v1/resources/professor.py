@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import request
-from database.commonQueries import autentication, get_registers, post_register
-from database.specialQueries import addSchoolToProfessor, getProfessorSchools
+from v1.database.commonQueries import autentication, get_registers, post_register
+from v1.database.specialQueries import addSchoolToProfessor, getProfessorSchools
 
 class Professor(Resource):
     def get(self):

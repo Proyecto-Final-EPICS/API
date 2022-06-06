@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import request
-from database.commonQueries import get_registers, post_register
-from database.specialQueries import getStudents, lastSessionGameOfStudent, login, addStudent, StudentGameList
+from v1.database.commonQueries import get_registers, post_register
+from v1.database.specialQueries import getStudents, lastSessionGameOfStudent, login, addStudent, StudentGameList
 
 class Student(Resource):
     def get(self):

@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import request
-from database.commonQueries import get_registers, post_register
-from database.specialQueries import getSchools
+from v1.database.commonQueries import get_registers, post_register
+from v1.database.specialQueries import getSchools
 
 class School(Resource):
     def get(self):
@@ -9,7 +9,7 @@ class School(Resource):
     
     def put(self):
         content = request.get_json()
-        return post_register("school",content)
+        return post_register("school", content)
 
 class BasicSchool(Resource):
     def get(self):

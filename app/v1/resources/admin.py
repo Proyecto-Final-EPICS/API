@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import request
-from database.commonQueries import autentication
+from v1.database.commonQueries import autentication
 
 class Admin(Resource):
     def post(self):

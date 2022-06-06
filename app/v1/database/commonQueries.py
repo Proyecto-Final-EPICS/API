@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from flask import jsonify, request
-from database.connection import get_db
+from v1.database.connection import get_db
 from flask_jwt_extended import create_access_token
 from datetime import datetime
 

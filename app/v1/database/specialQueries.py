@@ -1,15 +1,15 @@
-from database.commonQueries import get_registers
+from v1.database.commonQueries import get_registers
 from typing import Collection
 from pymongo import MongoClient
 from flask import jsonify, request
-from database.connection import get_db
+from v1.database.connection import get_db
 
 
 def getSchools():
     db = ""
     try:
         db = get_db()
-        schools = db["school"]
+        schools = db["schools"]
         schoolList = []
         for school in schools.find():
             schoolList.append(
@@ -88,7 +88,7 @@ def getStudents():
     schoolName = request.args.get('nameSchool')
     try:
         db = get_db()
-        schools = db["school"]
+        schools = db["schools"]
         query = schools.find(
             {'schoolName': schoolName},
             {'students': 1}
@@ -115,7 +115,7 @@ def login():
     password = request.form.get('password')
     game = request.form.get('game')
     db = get_db()
-    schools = db["school"]
+    schools = db["schools"]
     query = schools.aggregate([
         {'$match': {'schoolName': school}},
         {'$unwind': '$students'},
@@ -280,7 +280,7 @@ def getGameStudentProcess():
     db = ""
     try:
         db = get_db()
-        schools = db["school"]
+        schools = db["schools"]
         query = schools.find(
             {'schoolName': schoolName},
             {'students': 1}

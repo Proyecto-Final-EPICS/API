@@ -1,7 +1,7 @@
-from database.specialQueries import deleteObjective, getGameLevels, getGameNameAndTopic, getGameObjectives, getGameStudentProcess, putGameObjetives
+from v1.database.specialQueries import deleteObjective, getGameLevels, getGameNameAndTopic, getGameObjectives, getGameStudentProcess, putGameObjetives
 from flask_restful import Resource
 from flask import request
-from database.commonQueries import get_registers, post_register
+from v1.database.commonQueries import get_registers, post_register
 
 class Game(Resource):
     def get(self):
