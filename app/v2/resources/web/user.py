@@ -124,8 +124,9 @@ def put_user(content):
                 elem = Professor.objects.get(username=username)
             elif(role == 'rector'):
                 elem = Rector.objects.get(username=username)
-            else: return {'msg': 'User to modify must be either a student, a professor or a rector'} 
+            else: return {'msg': 'User to modify must be either a student, a professor or a rector'}
 
+            username_mod = content['username_mod']
             password = content['password']
             firstname = content['firstname']
             lastname = content['lastname']
@@ -134,31 +135,22 @@ def put_user(content):
             birth_date = content['birth_date']
             
             user_mod = {
-                'username': username, 'password': password, 'firstname': firstname, 
+                'username': username_mod, 'password': password, 'firstname': firstname, 
                 'lastname': lastname, 'id_school': id_school, 'role': role
             }
+            elem_mod = {
+                    'username': username_mod, 'firstname': firstname, 'lastname': lastname, 
+                    'id_school': id_school, 'identity_doc': identity_doc,
+                    'birth_date': birth_date
+                }
             if role == 'student':
-                elem_mod = {
-                    'username': username, 'firstname': firstname, 'lastname': lastname, 
-                    'id_school': id_school, 'identity_doc': identity_doc,
-                    'birth_date': birth_date, 'course': content['course'],
-                    'doc_type': content['doc_type']
-                }
+                elem_mod['course'] = content['course']
+                elem_mod['doc_type'] = content['doc_type']
+
             elif role == 'professor':
-                elem_mod = {
-                    'username': username, 'firstname': firstname, 'lastname': lastname, 
-                    'id_school': id_school, 'identity_doc': identity_doc,
-                    'birth_date': birth_date
-                }
+                pass
             elif role == 'rector':
-                elem_mod = {
-                    'username': username, 'firstname': firstname, 'lastname': lastname, 
-                    'id_school': id_school, 'identity_doc': identity_doc,
-                    'birth_date': birth_date
-                }
-            
-            # user_mod.validate()
-            # elem_mod.validate()
+                pass
 
             done = elem.modify(**elem_mod) and user.modify(**user_mod)
             if done: return {'user': user, role: elem}
@@ -166,8 +158,6 @@ def put_user(content):
 
         except (User.DoesNotExist, Student.DoesNotExist, Professor.DoesNotExist, Rector.DoesNotExist):
             return {'msg': 'Unexpected error'}
-        except ValidationError:
-            return {'msg': 'Invalid user data'}
         except NotUniqueError:
             return {'msg': 'Some fields required as unique are repeated'}
 
