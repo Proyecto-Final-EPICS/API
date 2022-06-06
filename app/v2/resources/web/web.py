@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
-# from v2.models import User, Admin, Rector, Professor
-from .general import auth, post_user
+import v2.resources.web.user as user
 
 app = Blueprint('web', __name__)
 
@@ -8,10 +7,15 @@ app = Blueprint('web', __name__)
 def root():
     return jsonify(msg="Welcome to /v2.0/web")
 
+# Se podría usar blueprints o resources
 @app.route('/login', methods=['POST'])
 def login():
-    return auth(request.get_json())
+    return user.login(request.get_json())
 
-@app.route('/register', methods=['POST'])
-def register():
-    return post_user(request.get_json())
+@app.route('/user', methods=['POST'])
+def post_user():
+    return user.post_user(request.get_json())
+
+@app.route('/user', methods=['DELETE'])
+def delete_user():
+    return user.delete_user(request.get_json())
