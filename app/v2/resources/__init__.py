@@ -1,0 +1,1 @@
+from .game.index import app as game_app

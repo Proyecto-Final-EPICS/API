@@ -8,8 +8,8 @@ class Game(me.Document):
     short_description = me.StringField(required=True)
     description = me.StringField()
     developers = me.ListField(me.DictField())
-    launchDate = me.DateField()
+    launch_date = me.DateField()
     logo = me.URLField()
-    id_school = me.StringField(required=True)
+    id_school = me.IntField(required=True)
 
     meta = {'collection': 'games'}

@@ -1,10 +1,11 @@
-import mongoengine as me
+import mongoengine as db
+from database import db
 
-class User(me.Document):
+class User(db.Document):
     # {"_id":{"$oid":"625b8eddf1560344a84c1387"},"name":"Teacher1","username":"Usurio1","password":"Contraseña","role":"professor","idSchool":{"$numberInt":"1"}}
-    name = me.StringField(required=True)
-    username = me.StringField(required=True)
-    password = me.StringField(required=True)
-    role = me.StringField(required=True)
-    idSchool = me.StringField(required=True)
+    name = db.StringField(required=True)
+    username = db.StringField(required=True, unique=True)
+    password = db.StringField(required=True)
+    role = db.StringField(required=True)
+    id_school = db.IntField()
     meta = {'collection': 'users'}
