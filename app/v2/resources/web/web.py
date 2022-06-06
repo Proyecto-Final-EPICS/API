@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from v2.models import User, Admin, Rector, Professor
-from .auth import auth
+# from v2.models import User, Admin, Rector, Professor
+from .general import auth, post_user
 
 app = Blueprint('web', __name__)
 
@@ -14,5 +14,4 @@ def login():
 
 @app.route('/register', methods=['POST'])
 def register():
-    content = request.get_json()
-    return ''
+    return post_user(request.get_json())
