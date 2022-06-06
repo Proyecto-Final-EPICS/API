@@ -1,7 +1,7 @@
 import mongoengine as me
 
 class Rector(me.Document):
-    id_school = me.StringField(required=True)
+    id_school = me.IntField(required=True)
     username = me.StringField(required=True)
     firstname = me.StringField(required=True)
     lastname = me.StringField(required=True)
