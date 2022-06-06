@@ -5,12 +5,17 @@ from v1 import v1
 from v2 import v2
 import datetime
 import os
+from database import db
 
 app = Flask(__name__)
 CORS(app)
 jwt = JWTManager(app)
 app.config['JWT_SECRET_KEY'] = os.getenv('SECRETKEY')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(days=1)
+app.config['MONGODB_HOST'] = os.getenv('DB_URL', 'http://localhost:27017')
+app.config['MONGODB_DB'] = os.getenv('DB_NAME', 'test')
+
+db.init_app(app)
 
 app.register_blueprint(v1)
 app.register_blueprint(v2, url_prefix='/v2.0')
