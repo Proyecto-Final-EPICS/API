@@ -19,3 +19,7 @@ def post_user():
 @app.route('/user', methods=['DELETE'])
 def delete_user():
     return user.delete_user(request.get_json())
+
+@app.route('/user', methods=['PUT'])
+def put_user():
+    return user.put_user(request.get_json())

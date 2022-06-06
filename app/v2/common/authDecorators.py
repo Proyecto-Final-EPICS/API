@@ -1,7 +1,7 @@
 from functools import wraps
 from flask_jwt_extended import verify_jwt_in_request, get_jwt
 from flask import jsonify
-from v2.models import Role
+from v2.models import Role, User
 
 def auth_required(l:list):
     def wraper(fn):
@@ -16,7 +16,37 @@ def auth_required(l:list):
         return decorator
     return wraper
 
-def greater_than():
+# def role_superior():
+#     def decorator(*args, **kwargs):
+#         role_required('>', *args, **kwargs)
+    
+#     return decorator
+
+# def role_superior_or_equal():
+#     def decorator(*args, **kwargs):
+#         role_required('>=', *args, **kwargs)
+    
+#     return decorator
+
+def self_allowed():
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(content, *args, **kwargs):
+
+            verify_jwt_in_request()
+            claims = get_jwt()
+                
+            username_claims = User.objects.get(username=claims['sub']['username'])
+            username_content = User.objects.get(username=content['username'])
+
+            if(username_claims == username_content):
+                return fn(content, *args, **kwargs)
+            else: return {'msg': 'Authentication error'}, 403
+        
+        return decorator
+    return wrapper
+
+def role_required(rel):
     def wraper(fn):
         @wraps(fn)
         def decorator(content, *args, **kwargs):
@@ -24,13 +54,20 @@ def greater_than():
             try:
                 verify_jwt_in_request()
                 claims = get_jwt()
+
                 role_claims = Role.objects.get(name=claims['sub']['role'])
                 role_content = Role.objects.get(name=content['role'])
 
-                if role_claims.permission_level < role_content.permission_level:
-                    return fn(content, *args, **kwargs) 
-                else: return jsonify(msg="You are not authorized to access this resource"), 403
-
+                if rel == '>':
+                    if role_claims.permission_level < role_content.permission_level:
+                        return fn(content, *args, **kwargs)
+                    else: return {'msg': "You are not authorized to access this resource"}, 403
+                    
+                elif rel=='>=':
+                    if role_claims.permission_level <= role_content.permission_level:
+                        return fn(content, *args, **kwargs)
+                    else: return {'msg': "You are not authorized to access this resource"}, 403
+                
             except KeyError:
                 return {'msg': 'Token\'s role and/or content\'s role not provided'}
             except Role.DoesNotExist:

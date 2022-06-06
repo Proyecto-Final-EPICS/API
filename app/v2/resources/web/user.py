@@ -1,7 +1,7 @@
 from v2.models import Role, User, Admin, Student, Professor, Rector
 from flask_jwt_extended import create_access_token
 from flask import jsonify
-from v2.common.authDecorators import greater_than
+from v2.common.authDecorators import role_required, self_allowed
 from mongoengine import NotUniqueError, ValidationError
 
 def login(content):
@@ -23,67 +23,66 @@ def login(content):
 
     return jsonify(result)
 
-@greater_than()
+@role_required('>')
 def post_user(content):
-    role_name = content['role']
+    # Role.objects.get(name=role)
+    role = content['role']
+    username = content['username']
+    
     try:
-        Role.objects.get(name=role_name)
-        username = content['username']
+        User.objects.get(username=username)
+        return jsonify(msg='User already exists')
+    except User.DoesNotExist:
+        password = content['password']
+        firstname = content['firstname']
+        lastname = content['lastname']
+        id_school = content['id_school']
+        identity_doc = content['identity_doc']
+        birth_date = content['birth_date']
+        
+        user = User(
+            username=username, password=password, firstname=firstname, 
+            lastname=lastname, id_school=id_school, role=role
+        )
+        if role == 'student':
+            elem = Student(
+                username=username, firstname=firstname, lastname=lastname, 
+                id_school=id_school, identity_doc=identity_doc, birth_date=birth_date,
+                course=content['course'], doc_type=content['doc_type'],
+                # phone=content['phone'], email=content['email'], legal_rep=content['legal_rep'],
+            )
+        elif role == 'professor':
+            elem = Professor(
+                username=username, firstname=firstname, lastname=lastname, 
+                id_school=id_school, identity_doc=identity_doc, birth_date=birth_date,
+                # phone=content['phone'], email=content['email'],
+            )
+        elif role == 'rector':
+            elem = Rector(
+                username=username, firstname=firstname, lastname=lastname, 
+                id_school=id_school, identity_doc=identity_doc, birth_date=birth_date,
+                # phone=content['phone'], email=content['email'],
+            )
+        else: return {'msg': 'User to delete must be either a student, a professor or a rector'}
         
         try:
-            User.objects.get(username=username)
-            return jsonify(msg='User already exists')
-        except User.DoesNotExist:
-            password = content['password']
-            firstname = content['firstname']
-            lastname = content['lastname']
-            id_school = content['id_school']
-            identity_doc = content['identity_doc']
-            birth_date = content['birth_date']
-            
-            user = User(
-                username=username, password=password, firstname=firstname, 
-                lastname=lastname, id_school=id_school, role=role_name
-            )
-            if role_name == 'student':
-                elem = Student(
-                    username=username, firstname=firstname, lastname=lastname, 
-                    id_school=id_school, identity_doc=identity_doc, birth_date=birth_date,
-                    course=content['course'], doc_type=content['doc_type'],
-                    # phone=content['phone'], email=content['email'], legal_rep=content['legal_rep'],
-                )
-            elif role_name == 'professor':
-                elem = Professor(
-                    username=username, firstname=firstname, lastname=lastname, 
-                    id_school=id_school, identity_doc=identity_doc, birth_date=birth_date,
-                    # phone=content['phone'], email=content['email'],
-                )
-            elif role_name == 'rector':
-                elem = Rector(
-                    username=username, firstname=firstname, lastname=lastname, 
-                    id_school=id_school, identity_doc=identity_doc, birth_date=birth_date,
-                    # phone=content['phone'], email=content['email'],
-                )
-            else: raise Role.DoesNotExist
-            
-            try:
-                user.validate()
-                elem.validate()
+            user.validate()
+            elem.validate()
 
-                elem.save()
-                user.save()
-            except ValidationError:
-                return {'msg': 'Invalid user data'}
-            except NotUniqueError:
-                return {'msg': 'Some fields required as unique are repeated'}
+            elem.save()
+            user.save()
+        except ValidationError:
+            return {'msg': 'Invalid user data'}
+        except NotUniqueError:
+            return {'msg': 'Some fields required as unique are repeated'}
 
-            return {'user': user, role_name: elem}
+        return {'user': user, role: elem}
 
-    except Role.DoesNotExist: return jsonify(msg='Invalid role')
+    # except Role.DoesNotExist: return jsonify(msg='Invalid role')
 
 def delete_user(content):
 
-    @greater_than()
+    @role_required('>')
     def with_role(content, user):
         try:
             if(user.role == 'student'):
@@ -110,3 +109,71 @@ def delete_user(content):
 
     except User.DoesNotExist: return {'msg': 'Non existing user'}
 
+# @self_allowed()
+def put_user(content):
+
+    @role_required('>')
+    def with_role(content, user):
+        try:
+            role = user.role
+            username = user.username
+
+            if(role == 'student'):
+                elem = Student.objects.get(username=username)
+            elif(role == 'professor'):
+                elem = Professor.objects.get(username=username)
+            elif(role == 'rector'):
+                elem = Rector.objects.get(username=username)
+            else: return {'msg': 'User to modify must be either a student, a professor or a rector'} 
+
+            password = content['password']
+            firstname = content['firstname']
+            lastname = content['lastname']
+            id_school = content['id_school']
+            identity_doc = content['identity_doc']
+            birth_date = content['birth_date']
+            
+            user_mod = {
+                'username': username, 'password': password, 'firstname': firstname, 
+                'lastname': lastname, 'id_school': id_school, 'role': role
+            }
+            if role == 'student':
+                elem_mod = {
+                    'username': username, 'firstname': firstname, 'lastname': lastname, 
+                    'id_school': id_school, 'identity_doc': identity_doc,
+                    'birth_date': birth_date, 'course': content['course'],
+                    'doc_type': content['doc_type']
+                }
+            elif role == 'professor':
+                elem_mod = {
+                    'username': username, 'firstname': firstname, 'lastname': lastname, 
+                    'id_school': id_school, 'identity_doc': identity_doc,
+                    'birth_date': birth_date
+                }
+            elif role == 'rector':
+                elem_mod = {
+                    'username': username, 'firstname': firstname, 'lastname': lastname, 
+                    'id_school': id_school, 'identity_doc': identity_doc,
+                    'birth_date': birth_date
+                }
+            
+            # user_mod.validate()
+            # elem_mod.validate()
+
+            done = elem.modify(**elem_mod) and user.modify(**user_mod)
+            if done: return {'user': user, role: elem}
+            else: return {'msg': 'The database doesn\'t match the query'}
+
+        except (User.DoesNotExist, Student.DoesNotExist, Professor.DoesNotExist, Rector.DoesNotExist):
+            return {'msg': 'Unexpected error'}
+        except ValidationError:
+            return {'msg': 'Invalid user data'}
+        except NotUniqueError:
+            return {'msg': 'Some fields required as unique are repeated'}
+
+    try:
+        user = User.objects.get(username=content['username'])
+        content['role'] = user.role
+        return with_role(content, user)
+    except User.DoesNotExist:
+        pass
