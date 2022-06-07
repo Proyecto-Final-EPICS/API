@@ -64,7 +64,7 @@ def delete_school(id_school):
 
 @app.route('/school/<id_school>', methods=['PUT'])
 def put_school(id_school):
-    return school.put_school(school, request.get_json())
+    return school.put_school(id_school, request.get_json())
 
 # COURSE ***********************************************
 @app.route('/school/<school>/course')

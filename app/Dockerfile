@@ -5,5 +5,5 @@ WORKDIR /app
 #Requeriments
 RUN pip install -r requirements.txt
 #port
-EXPOSE 5000
+# EXPOSE 5000
 CMD ["python3", "-u", "app.py"]
