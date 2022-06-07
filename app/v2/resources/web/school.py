@@ -1,35 +1,61 @@
 from v2.models import School
-from mongoengine import NotUniqueError, ValidationError, OperationError
 from flask import jsonify
+from v2.common.authDecorators import admin_required, rector_required
+from mongoengine import NotUniqueError, ValidationError
 
-def getSchool(id):
-    return School.objects.get(id=id).to_json()
-
-def postSchool(content):
-    school = School(**content)
+def get_schools():
+    return School.objects.to_json()
+    
+def get_school(id_school):
     try:
-        school.save()
-        return school.to_json()
+        return School.objects.get(id_school=id_school)
+    except School.DoesNotExist:
+        return {'msg': 'School does not exist'} 
+
+@admin_required
+def post_school(content):
+    id_school = content['id_school']
+    
+    try:
+        School.objects.get(id_school=id_school)
+        return {'msg': 'School already exists'}
+    except School.DoesNotExist:
+        
+        school = School(
+            id_school=id_school, school_name = content['school_name'],
+            contact_phone = content['contact_phone']
+        )
+        
+        try:
+            school.validate()
+            school.save()
+        except ValidationError:
+            return {'msg': 'Invalid school data'}
+        except NotUniqueError:
+            return {'msg': 'Some fields required as unique are repeated'}
+        
+        return school
+
+@admin_required
+def delete_school(id_school):
+    try:
+        School.objects.get(id_school=id_school).delete()
+        return School.objects.to_json()
+
+    except School.DoesNotExist: return {'msg': 'Non existing school'}
+
+@admin_required
+def put_school(id_school, content):
+    try:
+        school = School.objects.get(id_school=id_school)
+        school.modify(
+            id_school=content['id_school'],
+            school_name=content['school_name'],
+            contact_phone=content['contact_phone']
+        )
+        return school
+
+    except School.DoesNotExist:
+        return {'msg': 'School does not exist'}
     except NotUniqueError:
-        return jsonify(msg='School already exists')
-    except ValidationError:
-        return jsonify(msg='Invalid data')
-
-def delSchool(id):
-    try:
-        School.objects.get(id=id).delete()
-        return jsonify(msg='School deleted')
-    except School.DoesNotExist:
-        return jsonify(msg='School does not exist')
-    except OperationError:
-        return jsonify(msg='School cannot be deleted')
-
-def updateSchool(id, content):
-    try:
-        school = School.objects.get(id=id)
-        school.update(**content)
-        return school.to_json()
-    except School.DoesNotExist:
-        return jsonify(msg='School does not exist')
-    except ValidationError:
-        return jsonify(msg='Invalid data')
+        return {'msg': 'Some fields required as unique are repeated'}

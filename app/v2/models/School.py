@@ -7,7 +7,7 @@ class School(me.Document):
     students = me.ListField(me.DictField())
     rectors = me.ListField(me.DictField())
     professors = me.ListField(me.DictField())
-    contact_phone = me.DictField(required=True)
+    contact_phone = me.DictField()
     
     meta = {'collection': 'schools'}
     

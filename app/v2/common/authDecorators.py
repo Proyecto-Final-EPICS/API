@@ -12,7 +12,7 @@ def auth_required(l:list):
             if claims["role"] in l:
                 return fn(*args, **kwargs)
             else:
-                return jsonify(msg="You are not authorized to access this resource"), 403
+                return {'msg': "You are not authorized to access this resource"}, 403
         return decorator
     return wraper
 
@@ -34,7 +34,7 @@ def self_allowed():
         return decorator
     return wrapper
 
-def role_required(rel):
+def role_permission_required(rel):
     def wraper(fn):
         @wraps(fn)
         def decorator(content, *args, **kwargs):
@@ -43,11 +43,8 @@ def role_required(rel):
                 verify_jwt_in_request()
                 claims = get_jwt()
 
-                print('***************************************************************************')
                 role_claims = Role.objects.get(name=claims['sub']['role'])
-                print('***************************************************************************')
                 role_content = Role.objects.get(name=content['role'])
-                print('***************************************************************************')
 
                 if rel == '>':
                     if role_claims.permission_level < role_content.permission_level:
@@ -72,9 +69,21 @@ def admin_required(fn):
     def decorator(*args, **kwargs):
         verify_jwt_in_request()
         claims = get_jwt()
-        if 'admin'==claims['sub']['role']:
+        if claims['sub']['role'] == 'admin':
             return fn(*args, **kwargs)
         else:
-            return jsonify(msg="Admins only!"), 403
+            return {'msg': "Admins only!"}, 403
+
+    return decorator
+    
+def rector_required(fn):
+    @wraps(fn)
+    def decorator(*args, **kwargs):
+        verify_jwt_in_request()
+        claims = get_jwt()
+        if claims['sub']['role'] == 'rector':
+            return fn(*args, **kwargs)
+        else:
+            return {'msg': "Admins only!"}, 403
 
     return decorator
