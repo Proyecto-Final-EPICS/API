@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import v2.resources.web.user as user
 import v2.resources.web.school as school
-from . import course
+from . import course, game
 
 
 app = Blueprint("web", __name__)
@@ -86,3 +86,25 @@ def delete_course(id_school, code_course):
 @app.route('/school/<id_school>/course/<code_course>', methods=['PUT'])
 def put_course(id_school, code_course):
     return course.put_course(id_school, code_course, request.get_json())
+
+# GAME ***********************************************
+@app.route('/school/<id_school>/course/<code_course>/game')
+def get_games(id_school, code_course):
+    return game.get_games(id_school, code_course)
+
+@app.route('/school/<id_school>/course/<code_course>/game/<code_game>')
+def get_game(id_school, code_course, code_game):
+    return game.get_game(id_school, code_course, code_game)
+
+@app.route('/school/<id_school>/course/<code_course>/game', methods=['POST'])
+def post_game(id_school, code_course):
+    return game.post_game(id_school, code_course, request.get_json())
+
+@app.route('/school/<id_school>/course/<code_course>/game/<code_game>', methods=['DELETE'])
+def delete_game(id_school, code_course, code_game):
+    return game.delete_game(id_school, code_course, code_game)
+
+@app.route('/school/<id_school>/course/<code_course>/game/<code_game>', methods=['PUT'])
+def put_game(id_school, code_course, code_game):
+    return game.put_game(id_school, code_course, code_game, request.get_json())
+    

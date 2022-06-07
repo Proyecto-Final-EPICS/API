@@ -1,7 +1,7 @@
 import mongoengine as me
 
 class Game(me.Document):
-    code = me.StringField(required=True)
+    code = me.StringField(required=True, uniquie_with='id_school')
     name = me.StringField(required=True)
     level = me.StringField(required=True)
     topic = me.StringField()
@@ -10,6 +10,6 @@ class Game(me.Document):
     developers = me.ListField(me.DictField())
     launch_date = me.DateField()
     logo = me.URLField()
-    id_school = me.IntField(required=True)
+    id_school = me.IntField(required=True, unique_with='code')
 
     meta = {'collection': 'games'}
