@@ -87,3 +87,20 @@ def rector_required(fn):
             return {'msg': "Admins only!"}, 403
 
     return decorator
+
+def school_member_required(fn):
+    @wraps(fn)
+    def decorator(id_school, *args, **kwargs):
+        verify_jwt_in_request()
+        claims = get_jwt()
+        if claims['sub']['role'] == 'admin':
+            return fn(id_school, *args, **kwargs)
+        else:
+            username = claims['sub']['username']
+            user = User.objects.get(username=username)
+            if user.id_school == id_school:
+                return fn(id_school, *args, **kwargs)
+            else:
+                return {'msg': "You are not authorized to access this resource"}, 403
+
+    return decorator
