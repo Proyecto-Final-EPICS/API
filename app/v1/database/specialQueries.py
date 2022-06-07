@@ -9,7 +9,7 @@ def getSchools():
     db = ""
     try:
         db = get_db()
-        schools = db["schools"]
+        schools = db["school"]
         schoolList = []
         for school in schools.find():
             schoolList.append(
@@ -88,7 +88,7 @@ def getStudents():
     schoolName = request.args.get('nameSchool')
     try:
         db = get_db()
-        schools = db["schools"]
+        schools = db["school"]
         query = schools.find(
             {'schoolName': schoolName},
             {'students': 1}
@@ -115,7 +115,7 @@ def login():
     password = request.form.get('password')
     game = request.form.get('game')
     db = get_db()
-    schools = db["schools"]
+    schools = db["school"]
     query = schools.aggregate([
         {'$match': {'schoolName': school}},
         {'$unwind': '$students'},
@@ -280,7 +280,7 @@ def getGameStudentProcess():
     db = ""
     try:
         db = get_db()
-        schools = db["schools"]
+        schools = db["school"]
         query = schools.find(
             {'schoolName': schoolName},
             {'students': 1}

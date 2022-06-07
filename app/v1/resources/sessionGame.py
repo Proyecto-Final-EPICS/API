@@ -1,4 +1,4 @@
-from flask_restful import Resource, current_app
+from flask_restful import Resource
 from flask import request
 from v1.database.commonQueries import get_registers, post_register
 from v1.database.specialQueries import getSessionGamesByStudent, getGameSessionsOfStudent
@@ -9,9 +9,7 @@ class SessionGame(Resource):
     
     def put(self):
         content = request.get_json()
-        current_app.logger.info(content)
-        # return post_register("sessionGame",content)
-        return "ok"
+        return post_register("sessionGame", content)
 
 class SessionByStudent(Resource):
     def get(self):

@@ -1,14 +1,15 @@
 from flask import Blueprint, request, jsonify
-from v2.models import Game, Student, SessionGame
+from v2.models import Game, Student, SessionGame, School
 
 app = Blueprint('game', __name__)
 
 @app.route('/login', methods=['POST'])
 def logStudent():
-    content = request.get_json()
-    username = content['username']
+    content = request.form
+    print(content)
+    username = content.get('username')
     # password = content['password']
-    game_name = content['game']
+    game_name = content.get('game')
     # get the School from the game and check if the user is in the school
     try:
         game = Game.objects.get(name=game_name)
@@ -25,8 +26,16 @@ def logStudent():
             print('Creating a new Session for the student on that game')
             session = SessionGame(user= username, game_code= game.code, id_course=student.course, id_school=school)
             session.save()
-            return jsonify(msg="You are now logged in on this game!")
+            return jsonify({'username': username, 'score': '0', 'lastlevel': '0', 'win': 'False'})
     except Exception as e:
         print('error', e)
         return jsonify({'username': username, 'score': '0', 'lastlevel': '0', 'win': 'False'})
     
+# get schools and send the list of schools to the client in format [{'name': 'school_name', 'code': 'school_code'}]
+@app.route('/schools', methods=['GET'])
+def getSchools():
+    schools = School.objects.all()
+    schools_list = []
+    for school in schools:
+        schools_list.append({'Name': school.school_name, 'code': school.id_school})
+    return jsonify(schools_list)
