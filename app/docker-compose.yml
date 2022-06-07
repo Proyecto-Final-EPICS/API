@@ -1,11 +1,31 @@
-version: '3.8'
+version: '3'
 services:
   web:
+    restart: always
     build:
       context: .
     ports:
       - "5000:5000"
+    command: > 
+        sh -c "python3 -u app.py"
     volumes:
       - ./:/app
     env_file:
       - .env
+
+  # USAR EN CASO DE NO TENER MONGO INSTALADO EN EL COMPUTADOR
+  # mongodb:
+  #   restart: always
+  #   build:
+  #     context: .
+  #   image: mongo:4.4  
+  #   environment:
+  #     MONGO_INITDB_DATABASE: myFirstDatabase
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: pass
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - ./mongo/data:/data/db
+  #     #next is the test data
+  #     - ./mongo/basicStructure/init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
