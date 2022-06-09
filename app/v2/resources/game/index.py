@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from v2.models import Game, Student, SessionGame, School
+from . import session
 
 app = Blueprint('game', __name__)
 
@@ -39,3 +40,7 @@ def getSchools():
     for school in schools:
         schools_list.append({'Name': school.school_name, 'code': school.id_school})
     return jsonify(schools_list)
+
+@app.route('/session', methods=['POST', 'PUT'])
+def postSession():
+    return session.post_progress(request.get_json())

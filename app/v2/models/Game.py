@@ -11,5 +11,6 @@ class Game(me.Document):
     launch_date = me.DateField()
     logo = me.URLField()
     id_school = me.IntField(required=True, unique_with='code')
+    modules = me.ListField(me.DictField(), default = list)
 
     meta = {'collection': 'games'}
