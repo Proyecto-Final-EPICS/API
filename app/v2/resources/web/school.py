@@ -14,27 +14,35 @@ def get_school(id_school):
 
 @admin_required
 def post_school(content):
-    id_school = content['id_school']
-    
     try:
-        School.objects.get(id_school=id_school)
-        return {'msg': 'School already exists'}
-    except School.DoesNotExist:
-        
-        school = School(
-            id_school=id_school, school_name = content['school_name'],
-            contact_phone = content['contact_phone']
-        )
+        id_school = content['id_school']
         
         try:
-            school.validate()
-            school.save()
-        except ValidationError:
-            return {'msg': 'Invalid school data'}
-        except NotUniqueError:
-            return {'msg': 'Some fields required as unique are repeated'}
-        
-        return school
+            School.objects.get(id_school=id_school)
+            return {'msg': 'School already exists'}
+        except School.DoesNotExist:
+            
+            school = School(
+                id_school=id_school, school_name = content['school_name'],
+                contact_phone = content.get('contact_phone', {}), 
+                location=content.get('location', {}),
+                rectors=content.get('rectors', []), 
+                professors=content.get('professors', []),
+                students=content.get('students', []),
+                courses=content.get('courses', []),
+                games=content.get('games', []),
+            )
+            
+            try:
+                school.validate()
+                school.save()
+            except ValidationError:
+                return {'msg': 'Invalid school data'}
+            except NotUniqueError:
+                return {'msg': 'Some fields required as unique are repeated'}
+            
+            return jsonify(school)
+    except KeyError: return {'msg': 'Required fields not provided'}
 
 @admin_required
 def delete_school(id_school):
@@ -48,14 +56,13 @@ def delete_school(id_school):
 def put_school(id_school, content):
     try:
         school = School.objects.get(id_school=id_school)
-        school.modify(
-            id_school=content['id_school'],
-            school_name=content['school_name'],
-            contact_phone=content['contact_phone']
-        )
-        return school
+        school.modify(content)
+        
+        return jsonify(school)
 
     except School.DoesNotExist:
         return {'msg': 'School does not exist'}
     except NotUniqueError:
         return {'msg': 'Some fields required as unique are repeated'}
+    except KeyError:
+        return {'msg': 'Required fields not provided'}

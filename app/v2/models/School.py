@@ -8,6 +8,9 @@ class School(me.Document):
     rectors = me.ListField(me.DictField())
     professors = me.ListField(me.DictField())
     contact_phone = me.DictField()
+    location = me.DictField()
+    courses = me.ListField(me.DictField())
+    games = me.ListField(me.DictField())
     
     meta = {'collection': 'schools'}
     

@@ -53,7 +53,6 @@ def get_schools():
 def get_school(id_school):
     return school.get_school(id_school)
 
-
 @app.route("/school", methods=["POST"])
 def post_school():
     return school.post_school(request.get_json())
