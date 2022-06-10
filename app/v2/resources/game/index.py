@@ -21,7 +21,7 @@ def logStudent():
         try:
             print()
             session = SessionGame.objects.get(user=username, game_code= game.code)
-            return jsonify({'username':username, 'score':session.resume.score, 'lastlevel': '0', 'win':'False'})
+            return jsonify({'username':username, 'score':session.resume.score, 'lastlevel': '0', 'win':'False', 'id_sesion': 0})
         except SessionGame.DoesNotExist:
             # create a new Session for the student  on that game
             print('Creating a new Session for the student on that game')
