@@ -22,10 +22,11 @@ def post_game(id_school, content):
         return jsonify({'msg': 'Invalid game data'}), 400
 
 # get all games of a course
-@school_member_required
+# @school_member_required
 def get_games(id_school):
     try:
-        school: School = School.get(id_school=id_school)
+        # return Game.objects(id_school=id_school)
+        school: School = School.objects.get(id_school=id_school)
         return jsonify(school.games)
     except DoesNotExist:
         return jsonify({'msg': 'School does not exist'}), 404
@@ -33,7 +34,7 @@ def get_games(id_school):
         return jsonify({'error': str(e)}), 500
 
 # get a game of a course
-@school_member_required
+# @school_member_required
 def get_game(id_school, code_game):
     try:
         # course: Course = Course.objects.get(id_school=id_school, code=code_course)

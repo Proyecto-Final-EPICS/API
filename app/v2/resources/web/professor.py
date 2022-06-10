@@ -5,7 +5,7 @@ from random import randrange, random
 from v2.common.utils import age_from_birth_date
 from v2.models import Professor, User, School
 from v2.common.authDecorators import role_permission_required
-from . import school
+from . import school, course
 
 def get_school_professors(id_school):
     return Professor.objects(id_school=id_school).to_json()
@@ -45,6 +45,9 @@ def post_professor(content):
             user.save()
             
             school.add_professor(prof)
+            for course_code in prof.courses:
+                course.add_professor(course_code, prof)
+
         except ValidationError:
             return {'msg': 'Invalid user data'}
         except NotUniqueError:
@@ -62,6 +65,7 @@ def put_professor(username, content):
     try:
         user = User.objects.get(username=username)
         prof = Professor.objects.get(username=username)
+        courses_ini = prof.courses
 
         user_fields = list({'username', 'password', 'firstname', 'lastname', 
             'id_school'}.intersection(content.keys()))
@@ -76,6 +80,11 @@ def put_professor(username, content):
 
         if done:
             school.edit_professor(username, prof)
+            for c in courses_ini:
+                course.del_professor(c, prof)
+            for c in prof.courses:
+                course.add_professor(c, prof)
+
             return jsonify(prof)
         return {'msg': 'The database doesn\'t match the query'}
 
@@ -97,7 +106,9 @@ def delete_professor(username):
         prof.delete()
 
         school.del_professor(prof)
-        return Professor.objects.to_json()
+        for c in prof.courses:
+            course.del_professor(c, prof)
+        return get_school_professors(prof.id_school)
 
     except User.DoesNotExist: return {'msg': 'Non existing user'}
     except Professor.DoesNotExist: return {'msg': 'Unexpected error'}

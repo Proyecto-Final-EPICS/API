@@ -2,27 +2,27 @@ from mongoengine import NotUniqueError, ValidationError, DoesNotExist
 from flask import jsonify
 from v2.models import Course
 from v2.common import authDecorators, find
+from . import school
 
 # get all courses of a school
-@authDecorators.school_member_required
+# @authDecorators.school_member_required
 def get_courses(id_school):
     try:
         courses = Course.objects(id_school=id_school)
         # if not courses:
-        #     raise DoesNotExist("No courses found")
+        #     raise DoesNotExist('No courses found')
         return courses.to_json()
     except DoesNotExist:
         return {'msg': 'School does not exist'}
 
 # get a course of a school
-@authDecorators.school_member_required
-def get_course(id_school, code_course):
+# @authDecorators.school_member_required
+def get_course(id_school, course_code):
     try:
-        course = Course.objects.get(id_school=id_school, code=code_course)
-        if course:
-            return course.to_json()
-        else:
-            raise DoesNotExist("Course does not exist")
+        course = Course.objects.get(id_school=id_school, code=course_code)
+        # if not course:
+        #     raise DoesNotExist('Course does not exist')
+        return course.to_json()
     except DoesNotExist:
         return {'msg': 'School does not exist'}
 
@@ -40,19 +40,32 @@ def create_course(id_school, content):
 
 # delete a course of a school
 @authDecorators.school_member_required
-def delete_course(id_school, code_course):
+def delete_course(id_school, course_code):
     try:
-        course = Course.objects.get(id_school=id_school, code=code_course)
+        course = Course.objects.get(id_school=id_school, code=course_code)
         course.delete()
-        return {'msg': 'Course deleted'}
+        school.del_course(course)
+        return get_courses(course.id_school)
     except DoesNotExist:
         return {'msg': 'Course does not exist'}
 
 # Update a course of a school
 @authDecorators.school_member_required
-def put_course(id_school, code_course, content):
-    return jsonify({'msg': 'Not implemented'})
+def put_course(id_school, course_code, content):
+    try:
+        course = Course.objects.get(id_school=id_school, code=course_code)
+        done = course.modify(**content) if content != {} else True
 
+        if done:
+            school.edit_course(course_code, course)
+            return course.to_json()
+        return {'msg': 'The database doesn\'t match the query'}
+    except Course.DoesNotExist:
+        return {'msg': 'Course does not exist'}
+    except NotUniqueError:
+        return {'msg': 'Some fields required as unique are repeated'}
+    except KeyError:
+        return {'msg': 'Required fields not provided'}
 
 # #############################################################################
 from v2.common.authDecorators import rector_or_admin_required
@@ -61,22 +74,41 @@ from v2.common.authDecorators import rector_or_admin_required
 def post_course(id_school, content):
     resp = {}
     try:
-        course = Course.objects.get(id_school= id_school, code=content["code"])
-        if course:
-            resp = {"message": "Course already exists"}, 400
-    except:
+        Course.objects.get(id_school=id_school, code=content['code'])
+        resp = {'msg': 'Course already exists'}, 400
+    except Course.DoesNotExist:
+        # course = Course(id_school=id_school, **content)
+        course = Course(
+            id_school=id_school, 
+            code=content['code'], 
+            name=content['name'], 
+            period=content['period'], 
+            level=content.get('level', ''), 
+            capacity=content.get('capacity', ''), 
+            students=content.get('students', []), 
+            professors=content.get('professors', []), 
+            games=content.get('games', []), 
+        )
         try:
-            course = Course(id_school = id_school,**content)
+            course.validate()
             course.save()
-            resp = {"message": "Course created successfully"}, 201
+            school.add_course(course)
+            
+            resp = {'msg': 'Course created successfully'}, 201
         except ValidationError:
-            resp = {"message": "Invalid Data"}, 401
+            resp = {'msg': 'Invalid Data'}, 401
+        except NotUniqueError:
+            resp = {'msg': 'Not unique course'}, 401
         except Exception:
-            resp = {"message": "Error creating course"}, 500
+            resp = {'msg': 'Error creating course'}, 500
+    except KeyError as e: 
+        resp ={'msg': 'Required fields not provided', 'err': str(e)}
 
     return resp
 
 # FIELDS ***********************************************
+
+# Student
 def add_student(student):
     course = Course.objects.get(id_school=student.id_school, code=student.course)
     course.students.append({
@@ -95,8 +127,36 @@ def edit_student(username, student):
     }
     course.save()
 
-def del_student(student):
-    course = Course.objects.get(id_school=student.id_school, code=student.course)
+# def del_student(student):
+#     course = Course.objects.get(id_school=student.id_school, code=student.course)
+#     course.students.pop(find(course.students, lambda s: s['username'] == student.username))
+#     course.save()
+    
+def del_student(course_code, student):
+    course = Course.objects.get(id_school=student.id_school, code=course_code)
     course.students.pop(find(course.students, lambda s: s['username'] == student.username))
     course.save()
     
+# Professor
+def add_professor(course_code, prof):
+    course = Course.objects.get(id_school=prof.id_school, code=course_code)
+    course.professors.append({
+        'firstname': prof.firstname,
+        'lastname': prof.lastname,
+        'username': prof.username,
+    })
+    course.save()
+
+def edit_professor(course_code, username, prof):
+    course = Course.objects.get(id_school=prof.id_school, code=course_code)
+    course.professors[find(course.professors, lambda p: p['username'] == username)] = {
+        'firstname': prof.firstname,
+        'lastname': prof.lastname,
+        'username': prof.username,
+    }
+    course.save()
+
+def del_professor(course_code, prof):
+    course = Course.objects.get(id_school=prof.id_school, code=course_code)
+    course.professors.pop(find(course.professors, lambda p: p['username'] == prof.username))
+    course.save()

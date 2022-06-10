@@ -96,7 +96,7 @@ def delete_rector(username):
         rec.delete()
 
         school.del_rector(rec)
-        return Rector.objects.to_json()
+        return get_school_rectors(rec.id_school)
 
     except User.DoesNotExist: return {'msg': 'Non existing user'}
     except Rector.DoesNotExist: return {'msg': 'Unexpected error'}

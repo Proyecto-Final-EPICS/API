@@ -13,7 +13,8 @@ def login(content):
             'username': user.username,
             'firstname': user.firstname,
             'lastname': user.lastname,
-            'role': user.role
+            'role': user.role,
+            'id_school': user.id_school
         })
     except User.DoesNotExist:
         result['token'] = None
