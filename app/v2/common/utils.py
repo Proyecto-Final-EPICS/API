@@ -1,7 +1,7 @@
 from typing import List, Any, Callable, Optional
 
 # calcula un puntaje en base a un número de aciertos y un número de fallos
-def calc_score(numAciertos, numFallos):
+def calculate_score(numAciertos, numFallos):
     numPreguntas = numAciertos + numFallos
     if numPreguntas == 0:
         return 0
