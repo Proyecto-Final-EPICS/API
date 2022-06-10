@@ -1,3 +1,4 @@
+from email.policy import default
 import mongoengine as me
 
 class Game(me.Document):
@@ -9,7 +10,7 @@ class Game(me.Document):
     description = me.StringField()
     developers = me.ListField(me.DictField())
     launch_date = me.DateField()
-    logo = me.URLField()
+    logo = me.URLField(default = 'https://cdn.pixabay.com/photo/2016/12/23/07/00/game-1926906_960_720.png')
     id_school = me.IntField(required=True, unique_with='code')
     modules = me.ListField(me.DictField(), default = list)
 
