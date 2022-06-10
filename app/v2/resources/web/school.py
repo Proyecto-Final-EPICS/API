@@ -8,7 +8,7 @@ def get_schools():
     
 def get_school(id_school):
     try:
-        return School.objects.get(id_school=id_school)
+        return School.objects.get(id_school=id_school).to_json()
     except School.DoesNotExist:
         return {'msg': 'School does not exist'} 
 
@@ -58,7 +58,7 @@ def put_school(id_school, content):
         school = School.objects.get(id_school=id_school)
         school.modify(content)
         
-        return jsonify(school)
+        return school.to_json()
 
     except School.DoesNotExist:
         return {'msg': 'School does not exist'}

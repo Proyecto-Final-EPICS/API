@@ -21,11 +21,8 @@ def login(content):
     return result
 
 def get_users():
-
-    # return User.objects.to_json()
-
     return {
-        'user': User.objects.to_json(),
+        # 'user': User.objects.to_json(),
         'admin': Admin.objects.to_json(),
         'rector': Rector.objects.to_json(),
         'professor': Professor.objects.to_json(),
@@ -53,10 +50,10 @@ def get_user(username):
 
 @role_permission_required('>')
 def post_user(content):
-    role = content['role']
-    username = content['username']
-    
     try:
+        role = content['role']
+        username = content['username']
+
         User.objects.get(username=username)
         return {'msg': 'User already exists'}
     except User.DoesNotExist:
@@ -104,6 +101,7 @@ def post_user(content):
             return {'msg': 'Some fields required as unique are repeated'}
 
         return {'user': user, role: elem}
+    except KeyError: return {'msg': 'Required fields not provided'}
 
 def delete_user(username):
 
