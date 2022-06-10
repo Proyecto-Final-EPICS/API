@@ -53,9 +53,9 @@ def delete_professor(username):
 def get_school_professors(id_school):
     return professor.get_school_professors(id_school)
 
-@app.route('/school/<id_school>/professor/<username>', methods=['GET'])
-def get_school_professor(id_school, username):
-    return professor.get_school_professors(id_school, username)
+# @app.route('/school/<id_school>/professor/<username>', methods=['GET'])
+# def get_school_professor(id_school, username):
+#     return professor.get_school_professors(id_school, username)
 
 # RECTOR ***********************************************
 @app.route('/rector', methods=['POST'])
@@ -74,9 +74,30 @@ def delete_rector(username):
 def get_school_rectors(id_school):
     return rector.get_school_rectors(id_school)
 
-@app.route('/school/<id_school>/rector/<username>', methods=['GET'])
-def get_school_rector(id_school, username):
-    return rector.get_school_rectors(id_school, username)
+# @app.route('/school/<id_school>/rector/<username>', methods=['GET'])
+# def get_school_rector(id_school, username):
+#     return rector.get_school_rectors(id_school, username)
+
+# STUDENT ***********************************************
+@app.route('/student', methods=['POST'])
+def post_student():
+    return student.post_student(request.get_json())
+
+@app.route('/student/<username>', methods=['PUT'])
+def put_student(username):
+    return student.put_student(username, request.get_json())
+
+@app.route('/student/<username>', methods=['DELETE'])
+def delete_student(username):
+    return student.delete_student(username)
+
+@app.route('/school/<id_school>/student', methods=['GET'])
+def get_school_students(id_school):
+    return student.get_school_students(id_school)
+
+# @app.route('/school/<id_school>/student/<username>', methods=['GET'])
+# def get_school_student(id_school, username):
+#     return student.get_school_students(id_school, username)
 
 # SCHOOL ***********************************************
 @app.route('/school')
@@ -100,9 +121,9 @@ def put_school(id_school):
     return school.put_school(id_school, request.get_json())
 
 # COURSE ***********************************************
-@app.route('/school/<school>/course')
-def get_courses(school):
-    return course.get_courses(school)
+@app.route('/school/<id_school>/course')
+def get_courses(id_school):
+    return course.get_courses(id_school)
 
 @app.route('/school/<id_school>/course/<code_course>')
 def get_course(id_school, code_course):

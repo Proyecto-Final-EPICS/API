@@ -11,4 +11,5 @@ class Rector(me.Document):
     phone = me.DictField()
     gender = me.StringField()
     age = me.IntField()
+    photo = me.URLField()
     meta = {'collection': 'rectors'}
