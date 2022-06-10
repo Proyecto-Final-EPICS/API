@@ -47,21 +47,14 @@ def post_school(content):
     except KeyError: return {'msg': 'Required fields not provided'}
 
 @admin_required
-def delete_school(id_school):
-    try:
-        School.objects.get(id_school=id_school).delete()
-        return School.objects.to_json()
-
-    except School.DoesNotExist: return {'msg': 'Non existing school'}
-
-@admin_required
 def put_school(id_school, content):
     try:
         school = School.objects.get(id_school=id_school)
-        school.modify(content)
-        
-        return school.to_json()
+        done = school.modify(**content) if content != {} else True
 
+        if done: return school.to_json()
+        return {'msg': 'The database doesn\'t match the query'}
+        
     except School.DoesNotExist:
         return {'msg': 'School does not exist'}
     except NotUniqueError:
@@ -69,7 +62,17 @@ def put_school(id_school, content):
     except KeyError:
         return {'msg': 'Required fields not provided'}
 
+@admin_required
+def delete_school(id_school):
+    try:
+        School.objects.get(id_school=id_school).delete()
+        return School.objects.to_json()
+
+    except School.DoesNotExist: return {'msg': 'Non existing school'}
+
 # FIELDS ************************************************
+
+# Professor
 def add_professor(prof):
     school = School.objects.get(id_school=prof.id_school)
     school.professors.append({
@@ -95,6 +98,7 @@ def del_professor(prof):
     school.professors.pop(find(school.professors, lambda p: p['username'] == prof.username))
     school.save()
 
+# Rector
 def add_rector(rec):
     school = School.objects.get(id_school=rec.id_school)
     school.rectors.append({
@@ -117,6 +121,7 @@ def del_rector(rec):
     school.rectors.pop(find(school.rectors, lambda r: r['username'] == rec.username))
     school.save()
 
+# Student
 def add_student(student):
     school = School.objects.get(id_school=student.id_school)
     school.students.append({
@@ -138,5 +143,27 @@ def edit_student(username, student):
 def del_student(student):
     school = School.objects.get(id_school=student.id_school)
     school.students.pop(find(school.students, lambda s: s['username'] == student.username))
+    school.save()
+    
+# Course
+def add_course(course):
+    school = School.objects.get(id_school=course.id_school)
+    school.courses.append({
+        'code': course.code,
+        'name': course.name,
+    })
+    school.save()
+
+def edit_course(code, course):
+    school = School.objects.get(id_school=course.id_school)
+    school.courses[find(school.courses, lambda c: c['code'] == code)] = {
+        'code': course.code,
+        'name': course.name,
+    }
+    school.save()
+
+def del_course(course):
+    school = School.objects.get(id_school=course.id_school)
+    school.courses.pop(find(school.courses, lambda c: c['code'] == course.code))
     school.save()
     

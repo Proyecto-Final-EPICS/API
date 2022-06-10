@@ -65,6 +65,7 @@ def put_student(username, content):
     try:
         user = User.objects.get(username=username)
         student = Student.objects.get(username=username)
+        course_ini = student.course
 
         user_fields = list({'username', 'password', 'firstname', 'lastname', 
             'id_school'}.intersection(content.keys()))
@@ -79,7 +80,11 @@ def put_student(username, content):
 
         if done:
             school.edit_student(username, student)
+            if course_ini != content['course']:
+                course.del_student(course_ini, student)
+                course.add_student(student)
             course.edit_student(username, student)
+
             return jsonify(student)
         return {'msg': 'The database doesn\'t match the query'}
 
@@ -101,8 +106,9 @@ def delete_student(username):
         student.delete()
 
         school.del_student(student)
-        course.del_student(student)
-        return Student.objects.to_json()
+        course.del_student(student.course, student)
+
+        return get_school_students(student.id_school)
 
     except User.DoesNotExist: return {'msg': 'Non existing user'}
     except Student.DoesNotExist: return {'msg': 'Unexpected error'}

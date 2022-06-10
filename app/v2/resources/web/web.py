@@ -143,7 +143,7 @@ def put_course(id_school, code_course):
 
 # GAME ***********************************************
 @app.route('/school/<id_school>/game')
-def get_games(id_school, code_course):
+def get_games(id_school):
     return game.get_games(id_school)
 
 @app.route('/school/<id_school>/game/<code_game>')
