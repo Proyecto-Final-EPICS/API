@@ -57,6 +57,27 @@ def get_school_professors(id_school):
 def get_school_professor(id_school, username):
     return professor.get_school_professors(id_school, username)
 
+# RECTOR ***********************************************
+@app.route('/rector', methods=['POST'])
+def post_rector():
+    return rector.post_rector(request.get_json())
+
+@app.route('/rector/<username>', methods=['PUT'])
+def put_rector(username):
+    return rector.put_rector(username, request.get_json())
+
+@app.route('/rector/<username>', methods=['DELETE'])
+def delete_rector(username):
+    return rector.delete_rector(username)
+
+@app.route('/school/<id_school>/rector', methods=['GET'])
+def get_school_rectors(id_school):
+    return rector.get_school_rectors(id_school)
+
+@app.route('/school/<id_school>/rector/<username>', methods=['GET'])
+def get_school_rector(id_school, username):
+    return rector.get_school_rectors(id_school, username)
+
 # SCHOOL ***********************************************
 @app.route('/school')
 def get_schools():

@@ -47,12 +47,13 @@ def post_professor(content):
             prof.save()
             user.save()
             
-            # school = School.objects.get(id_school=prof.id_school)
-            # school['professors'].append({
-            #     'firstname': prof.firstname,
-            #     'lastname': prof.lastname,
-            #     'username': prof.username
-            # })
+            school = School.objects.get(id_school=prof.id_school)
+            school['professors'].append({
+                'firstname': prof.firstname,
+                'lastname': prof.lastname,
+                'username': prof.username,
+                'department': prof.department
+            })
         except ValidationError:
             return {'msg': 'Invalid user data'}
         except NotUniqueError:
@@ -68,7 +69,6 @@ def post_professor(content):
 
 def put_professor(username, content):
     try:
-        print(username)
         user = User.objects.get(username=username)
         prof = Professor.objects.get(username=username)
 
@@ -98,7 +98,12 @@ def put_professor(username, content):
 
         done = (prof.modify(**content) if content != {} else True) and (user.modify(**user_mod) if user_mod != {} else True)
 
-        if done: return jsonify(prof)
+        if done:
+            # school = School.objects.get(id_school=prof.id_school)
+            # school.modify(professors={
+                
+            # })
+            return jsonify(prof)
         return {'msg': 'The database doesn\'t match the query'}
 
     except User.DoesNotExist:
