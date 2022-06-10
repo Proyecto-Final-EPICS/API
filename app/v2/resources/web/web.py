@@ -1,51 +1,64 @@
 from flask import Blueprint, request, jsonify
-import v2.resources.web.user as user
-import v2.resources.web.school as school
-from . import course, game
+from . import course, game, user, school, professor, admin, rector, student
 
+app = Blueprint('web', __name__)
 
-app = Blueprint("web", __name__)
-
-
-@app.route("/")
+@app.route('/')
 def root():
-    return jsonify(msg="Welcome to /v2.0/web")
-
+    return jsonify(msg='Welcome to /v2.0/web')
 
 # USER ***********************************************
-# Se podría usar blueprints o resources
-@app.route("/login", methods=["POST"])
+@app.route('/login', methods=['POST'])
 def login():
     return user.login(request.get_json())
 
-
-@app.route("/user")
+@app.route('/user')
 def get_users():
     return user.get_users()
 
 
-@app.route("/user/<username>")
+@app.route('/user/<username>')
 def get_user(username):
     return user.get_user(username)
 
 
-@app.route("/user", methods=["POST"])
+@app.route('/user', methods=['POST'])
 def post_user():
     return user.post_user(request.get_json())
 
 
-@app.route("/user/<username>", methods=["DELETE"])
+@app.route('/user/<username>', methods=['DELETE'])
 def delete_user(username):
     return user.delete_user(username)
 
 
-@app.route("/user/<username>", methods=["PUT"])
+@app.route('/user/<username>', methods=['PUT'])
 def put_user(username):
     return user.put_user(username, request.get_json())
 
+# PROFESSOR ***********************************************
+@app.route('/professor', methods=['POST'])
+def post_professor():
+    return professor.post_professor(request.get_json())
+
+@app.route('/professor/<username>', methods=['PUT'])
+def put_professor(username):
+    return professor.put_professor(username, request.get_json())
+
+@app.route('/professor/<username>', methods=['DELETE'])
+def delete_professor(username):
+    return professor.delete_professor(username)
+
+@app.route('/school/<id_school>/professor', methods=['GET'])
+def get_school_professors(id_school):
+    return professor.get_school_professors(id_school)
+
+@app.route('/school/<id_school>/professor/<username>', methods=['GET'])
+def get_school_professor(id_school, username):
+    return professor.get_school_professors(id_school, username)
 
 # SCHOOL ***********************************************
-@app.route("/school")
+@app.route('/school')
 def get_schools():
     return school.get_schools()
 
@@ -53,7 +66,7 @@ def get_schools():
 def get_school(id_school):
     return school.get_school(id_school)
 
-@app.route("/school", methods=["POST"])
+@app.route('/school', methods=['POST'])
 def post_school():
     return school.post_school(request.get_json())
 

@@ -11,5 +11,4 @@ class Rector(me.Document):
     phone = me.DictField()
     gender = me.StringField()
     age = me.IntField()
-    phone = me.DictField()
     meta = {'collection': 'rectors'}
