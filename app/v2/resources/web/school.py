@@ -2,7 +2,9 @@ from v2.models import School
 from flask import jsonify
 from v2.common.authDecorators import admin_required, rector_required
 from mongoengine import NotUniqueError, ValidationError
+from v2.common.utils import find
 
+# MAIN REQUESTS ************************************************
 def get_schools():
     return School.objects.to_json()
     
@@ -66,3 +68,75 @@ def put_school(id_school, content):
         return {'msg': 'Some fields required as unique are repeated'}
     except KeyError:
         return {'msg': 'Required fields not provided'}
+
+# FIELDS ************************************************
+def add_professor(prof):
+    school = School.objects.get(id_school=prof.id_school)
+    school.professors.append({
+        'firstname': prof.firstname,
+        'lastname': prof.lastname,
+        'username': prof.username,
+        'department': prof.department
+    })
+    school.save()
+
+def edit_professor(username, prof):
+    school = School.objects.get(id_school=prof.id_school)
+    school.professors[find(school.professors, lambda p: p['username'] == username)] = {
+        'firstname': prof.firstname,
+        'lastname': prof.lastname,
+        'username': prof.username,
+        'department': prof.department
+    }
+    school.save()
+
+def del_professor(prof):
+    school = School.objects.get(id_school=prof.id_school)
+    school.professors.pop(find(school.professors, lambda p: p['username'] == prof.username))
+    school.save()
+
+def add_rector(rec):
+    school = School.objects.get(id_school=rec.id_school)
+    school.rectors.append({
+        'firstname': rec.firstname,
+        'lastname': rec.lastname,
+        'username': rec.username,
+    })
+
+def edit_rector(username, rec):
+    school = School.objects.get(id_school=rec.id_school)
+    school.rectors[find(school.rectors, lambda r: r['username'] == username)] = {
+        'firstname': rec.firstname,
+        'lastname': rec.lastname,
+        'username': rec.username,
+    }
+    school.save()
+
+def del_rector(rec):
+    school = School.objects.get(id_school=rec.id_school)
+    school.rectors.pop(find(school.rectors, lambda r: r['username'] == rec.username))
+    school.save()
+
+def add_student(student):
+    school = School.objects.get(id_school=student.id_school)
+    school.students.append({
+        'firstname': student.firstname,
+        'lastname': student.lastname,
+        'username': student.username,
+    })
+    school.save()
+
+def edit_student(username, student):
+    school = School.objects.get(id_school=student.id_school)
+    school.students[find(school.students, lambda s: s['username'] == username)] = {
+        'firstname': student.firstname,
+        'lastname': student.lastname,
+        'username': student.username,
+    }
+    school.save()
+
+def del_student(student):
+    school = School.objects.get(id_school=student.id_school)
+    school.students.pop(find(school.students, lambda s: s['username'] == student.username))
+    school.save()
+    

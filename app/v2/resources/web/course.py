@@ -1,15 +1,15 @@
 from mongoengine import NotUniqueError, ValidationError, DoesNotExist
 from flask import jsonify
 from v2.models import Course
-from v2.common import authDecorators
+from v2.common import authDecorators, find
 
 # get all courses of a school
 @authDecorators.school_member_required
 def get_courses(id_school):
     try:
         courses = Course.objects(id_school=id_school)
-        if not courses:
-            raise DoesNotExist("No courses found")
+        # if not courses:
+        #     raise DoesNotExist("No courses found")
         return courses.to_json()
     except DoesNotExist:
         return {'msg': 'School does not exist'}
@@ -75,3 +75,28 @@ def post_course(id_school, content):
             resp = {"message": "Error creating course"}, 500
 
     return resp
+
+# FIELDS ***********************************************
+def add_student(student):
+    course = Course.objects.get(id_school=student.id_school, code=student.course)
+    course.students.append({
+        'firstname': student.firstname,
+        'lastname': student.lastname,
+        'username': student.username,
+    })
+    course.save()
+
+def edit_student(username, student):
+    course = Course.objects.get(id_school=student.id_school, code=student.course)
+    course.students[find(course.students, lambda s: s['username'] == username)] = {
+        'firstname': student.firstname,
+        'lastname': student.lastname,
+        'username': student.username,
+    }
+    course.save()
+
+def del_student(student):
+    course = Course.objects.get(id_school=student.id_school, code=student.course)
+    course.students.pop(find(course.students, lambda s: s['username'] == student.username))
+    course.save()
+    

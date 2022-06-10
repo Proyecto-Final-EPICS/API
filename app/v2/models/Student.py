@@ -1,12 +1,12 @@
 import mongoengine as me
 
-class Representative(me.EmbeddedDocument):
-    firstname = me.StringField(required=True)
-    lastname = me.StringField(required=True)
-    identity_doc = me.StringField(required=True)
-    phone = me.DictField()
 
 class Student(me.Document):
+    class Representative(me.EmbeddedDocument):
+        firstname = me.StringField()
+        lastname = me.StringField()
+        identity_doc = me.StringField()
+        phone = me.DictField()
     username = me.StringField(required=True, unique=True)
     firstname = me.StringField(required=True)
     lastname = me.StringField(required=True)
@@ -15,6 +15,8 @@ class Student(me.Document):
     identity_doc = me.StringField(required=True, unique=True)
     doc_type = me.StringField(required=True)
     birth_date = me.DateTimeField(required=True)
+    gender = me.StringField()
+    photo=me.URLField()
     age = me.IntField()
     address = me.StringField()
     phone = me.DictField()
