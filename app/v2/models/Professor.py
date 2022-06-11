@@ -13,5 +13,5 @@ class Professor(me.Document):
     age = me.IntField()
     photo = me.URLField()
     department = me.StringField()
-    courses = me.ListField(me.StringField())
+    courses = me.ListField(me.DictField())
     meta = {'collection': 'professors'}

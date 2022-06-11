@@ -1,6 +1,6 @@
 from mongoengine import NotUniqueError, ValidationError, DoesNotExist
 from flask import jsonify
-from v2.models import Course
+from v2.models import Course, Professor, Student
 from v2.common import authDecorators, find
 from . import school
 
@@ -138,25 +138,57 @@ def del_student(course_code, student):
     course.save()
     
 # Professor
-def add_professor(course_code, prof):
-    course = Course.objects.get(id_school=prof.id_school, code=course_code)
-    course.professors.append({
-        'firstname': prof.firstname,
-        'lastname': prof.lastname,
-        'username': prof.username,
-    })
-    course.save()
+def add_professor(id_school, course_code, prof):
+    try:
+        course = Course.objects.get(id_school=id_school, code=course_code)
+        course.professors.append({
+            'firstname': prof.firstname,
+            'lastname': prof.lastname,
+            'username': prof.username,
+            'department': prof.department,
+        })
+        course.save()
+        return True
+    except (Course.DoesNotExist, ValidationError):
+        return False
 
-def edit_professor(course_code, username, prof):
-    course = Course.objects.get(id_school=prof.id_school, code=course_code)
-    course.professors[find(course.professors, lambda p: p['username'] == username)] = {
-        'firstname': prof.firstname,
-        'lastname': prof.lastname,
-        'username': prof.username,
-    }
-    course.save()
+def edit_professor(id_school, course_code, username, prof):
+    try:
+        course = Course.objects.get(id_school=id_school, code=course_code)
+        course.professors[find(course.professors, lambda p: p['username'] == username)] = {
+            'firstname': prof.firstname,
+            'lastname': prof.lastname,
+            'username': prof.username,
+            'department': prof.department,
+        }
+        course.save()
+        return True
+    except (Course.DoesNotExist, ValidationError):
+        return False
 
-def del_professor(course_code, prof):
-    course = Course.objects.get(id_school=prof.id_school, code=course_code)
-    course.professors.pop(find(course.professors, lambda p: p['username'] == prof.username))
-    course.save()
+def del_professor(id_school, course_code, username):
+    try:
+        course = Course.objects.get(id_school=id_school, code=course_code)
+        course.professors.pop(find(course.professors, lambda p: p['username'] == username))
+        course.save()
+        return True
+    except (Course.DoesNotExist, ValidationError):
+        return False
+
+def update_professors(id_school, course_code):
+    try:
+        profs = list(filter(lambda x: (
+            # course_code in map(lambda c: c['code'], x.courses)
+            course_code in [c['code'] for c in x.courses]
+        ), Professor.objects(id_school=id_school)))
+        
+        return Course.objects.get(id_school=id_school).modify(
+            professors=list(map(lambda x: {
+                'username': x.username,
+                'firstname': x.firstname,
+                'lastname': x.lastname,
+                'department': x.department,
+            }, profs))
+        )
+    except (Course.DoesNotExist, Professor.DoesNotExist):
+        return False
