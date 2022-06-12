@@ -80,7 +80,8 @@ def add_professor(id_school, prof):
             'firstname': prof.firstname,
             'lastname': prof.lastname,
             'username': prof.username,
-            'department': prof.department
+            'department': prof.department,
+            'photo': prof.photo,
         })
         school.save()
         return True
@@ -94,7 +95,8 @@ def edit_professor(id_school, username, prof):
             'firstname': prof.firstname,
             'lastname': prof.lastname,
             'username': prof.username,
-            'department': prof.department
+            'department': prof.department,
+            'photo': prof.photo,
         }
         school.save()
         return True
@@ -110,110 +112,150 @@ def del_professor(id_school, username):
     except (School.DoesNotExist, ValidationError):
         return False
 
-def update_professors(id_school):
-    try:
-        profs = Professor.objects(id_school=id_school)
-        return School.objects.get(id_school=id_school).modify(
-            professors=list(map(lambda x: {
-                'username': x.username,
-                'firstname': x.firstname,
-                'lastname': x.lastname,
-                'department': x.department,
-            }, profs))
-        )
-    except (School.DoesNotExist, Professor.DoesNotExist):
-        return False
+# def update_professors(id_school):
+#     try:
+#         profs = Professor.objects(id_school=id_school)
+#         return School.objects.get(id_school=id_school).modify(
+#             professors=list(map(lambda x: {
+#                 'username': x.username,
+#                 'firstname': x.firstname,
+#                 'lastname': x.lastname,
+#                 'department': x.department,
+#             }, profs))
+#         )
+#     except (School.DoesNotExist, Professor.DoesNotExist):
+#         return False
 
 # Rector
-def add_rector(rec):
-    school = School.objects.get(id_school=rec.id_school)
-    school.rectors.append({
-        'firstname': rec.firstname,
-        'lastname': rec.lastname,
-        'username': rec.username,
-    })
-
-def edit_rector(username, rec):
-    school = School.objects.get(id_school=rec.id_school)
-    school.rectors[find(school.rectors, lambda r: r['username'] == username)] = {
-        'firstname': rec.firstname,
-        'lastname': rec.lastname,
-        'username': rec.username,
-    }
-    school.save()
-
-def del_rector(rec):
-    school = School.objects.get(id_school=rec.id_school)
-    school.rectors.pop(find(school.rectors, lambda r: r['username'] == rec.username))
-    school.save()
-
-def update_rectors(id_school, rectors):
+def add_rector(id_school, rec):
     try:
-        return School.objects.get(id_school=id_school).modify(
-            rectors=list(map(lambda x: {
-                'username': x.username,
-                'firstname': x.firstname,
-                'lastname': x.lastname,
-            }, rectors))
-        )
-    except School.DoesNotExist:
+        school = School.objects.get(id_school=id_school)
+        school.rectors.append({
+            'firstname': rec.firstname,
+            'lastname': rec.lastname,
+            'username': rec.username,
+            'photo': rec.photo,
+        })
+        school.save()
+        return True
+    except (School.DoesNotExist, ValidationError):
         return False
+
+def edit_rector(id_school, username, rec):
+    try:
+        school = School.objects.get(id_school=id_school)
+        school.rectors[find(school.rectors, lambda p: p['username'] == username)] = {
+            'firstname': rec.firstname,
+            'lastname': rec.lastname,
+            'username': rec.username,
+            'photo': rec.photo,
+        }
+        school.save()
+        return True
+    except (School.DoesNotExist, ValidationError):
+        return False
+
+def del_rector(id_school, username):
+    try:
+        school = School.objects.get(id_school=id_school)
+        school.rectors.pop(find(school.rectors, lambda p: p['username'] == username))
+        school.save()
+        return True
+    except (School.DoesNotExist, ValidationError):
+        return False
+
+# def update_rectors(id_school, rectors):
+#     try:
+#         return School.objects.get(id_school=id_school).modify(
+#             rectors=list(map(lambda x: {
+#                 'username': x.username,
+#                 'firstname': x.firstname,
+#                 'lastname': x.lastname,
+#             }, rectors))
+#         )
+#     except School.DoesNotExist:
+#         return False
 
 # Student
-def add_student(student):
-    school = School.objects.get(id_school=student.id_school)
-    school.students.append({
-        'firstname': student.firstname,
-        'lastname': student.lastname,
-        'username': student.username,
-    })
-    school.save()
-
-def edit_student(username, student):
-    school = School.objects.get(id_school=student.id_school)
-    school.students[find(school.students, lambda s: s['username'] == username)] = {
-        'firstname': student.firstname,
-        'lastname': student.lastname,
-        'username': student.username,
-    }
-    school.save()
-
-def del_student(student):
-    school = School.objects.get(id_school=student.id_school)
-    school.students.pop(find(school.students, lambda s: s['username'] == student.username))
-    school.save()
-
-def update_students(id_school, students):
+def add_student(id_school, student):
     try:
-        return School.objects.get(id_school=id_school).modify(
-            students=list(map(lambda x: {
-                'username': x.username,
-                'firstname': x.firstname,
-                'lastname': x.lastname,
-            }, students))
-        )
-    except School.DoesNotExist:
+        school = School.objects.get(id_school=id_school)
+        school.students.append({
+            'firstname': student.firstname,
+            'lastname': student.lastname,
+            'username': student.username,
+            'photo': student.photo,
+        })
+        school.save()
+        return True
+    except (School.DoesNotExist, ValidationError):
         return False
 
+def edit_student(id_school, username, student):
+    try:
+        school = School.objects.get(id_school=id_school)
+        school.students[find(school.students, lambda p: p['username'] == username)] = {
+            'firstname': student.firstname,
+            'lastname': student.lastname,
+            'username': student.username,
+            'photo': student.photo,
+        }
+        school.save()
+        return True
+    except (School.DoesNotExist, ValidationError):
+        return False
+
+def del_student(id_school, username):
+    try:
+        school = School.objects.get(id_school=id_school)
+        school.students.pop(find(school.students, lambda p: p['username'] == username))
+        school.save()
+        return True
+    except (School.DoesNotExist, ValidationError):
+        return False
+
+# def update_students(id_school, students):
+#     try:
+#         return School.objects.get(id_school=id_school).modify(
+#             students=list(map(lambda x: {
+#                 'username': x.username,
+#                 'firstname': x.firstname,
+#                 'lastname': x.lastname,
+#             }, students))
+#         )
+#     except School.DoesNotExist:
+#         return False
+
 # Course
-def add_course(course):
-    school = School.objects.get(id_school=course.id_school)
-    school.courses.append({
-        'code': course.code,
-        'name': course.name,
-    })
-    school.save()
+def add_course(id_school, course):
+    try:
+        school = School.objects.get(id_school=id_school)
+        school.courses.append({
+            'code': course.code,
+            'name': course.name,
+        })
+        school.save()
+        return True
+    except (School.DoesNotExist, ValidationError):
+        return False
 
-def edit_course(code, course):
-    school = School.objects.get(id_school=course.id_school)
-    school.courses[find(school.courses, lambda c: c['code'] == code)] = {
-        'code': course.code,
-        'name': course.name,
-    }
-    school.save()
+def edit_course(id_school, course_code, course):
+    try:
+        school = School.objects.get(id_school=id_school)
+        school.courses[find(school.courses, lambda p: p['code'] == course_code)] = {
+            'code': course.code,
+            'name': course.name,
+        }
+        school.save()
+        return True
+    except (School.DoesNotExist, ValidationError):
+        return False
 
-def del_course(course):
-    school = School.objects.get(id_school=course.id_school)
-    school.courses.pop(find(school.courses, lambda c: c['code'] == course.code))
-    school.save()
-    
+def del_course(id_school, course_code):
+    try:
+        school = School.objects.get(id_school=id_school)
+        school.courses.pop(find(school.courses, lambda p: p['code'] == course_code))
+        school.save()
+        return True
+    except (School.DoesNotExist, ValidationError):
+        return False

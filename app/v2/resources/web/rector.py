@@ -19,6 +19,8 @@ def post_rector(content):
         User.objects.get(username=content['username'])
         return {'msg': 'User already exists'}
     except User.DoesNotExist:
+        School.objects.get(id_school=content['id_school'])
+        
         user = User(
             username=content['username'], password=content['password'], firstname=content['firstname'],
             lastname=content['lastname'], id_school=content['id_school'], role='rector'
@@ -43,7 +45,7 @@ def post_rector(content):
             rec.save()
             user.save()
             
-            school.add_rector(rec)
+            school.add_rector(rec.id_school, rec)
         except ValidationError:
             return {'msg': 'Invalid user data'}
         except NotUniqueError:
@@ -74,7 +76,7 @@ def put_rector(username, content):
         done = (rec.modify(**content) if content != {} else True) and (user.modify(**user_mod) if user_mod != {} else True)
 
         if done:
-            school.edit_rector(username, rec)
+            school.edit_rector(rec.id_school, username, rec)
             return jsonify(rec)
         return {'msg': 'The database doesn\'t match the query'}
 
@@ -95,7 +97,7 @@ def delete_rector(username):
         user.delete()
         rec.delete()
 
-        school.del_rector(rec)
+        school.del_rector(rec.id_school, username)
         return get_school_rectors(rec.id_school)
 
     except User.DoesNotExist: return {'msg': 'Non existing user'}

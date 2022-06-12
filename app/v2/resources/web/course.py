@@ -109,33 +109,42 @@ def post_course(id_school, content):
 # FIELDS ***********************************************
 
 # Student
-def add_student(student):
-    course = Course.objects.get(id_school=student.id_school, code=student.course)
-    course.students.append({
-        'firstname': student.firstname,
-        'lastname': student.lastname,
-        'username': student.username,
-    })
-    course.save()
+def add_student(id_school, course_code, student):
+    try:
+        course = Course.objects.get(id_school=id_school, code=course_code)
+        course.students.append({
+            'firstname': student.firstname,
+            'lastname': student.lastname,
+            'username': student.username,
+            'photo': student.photo,
+        })
+        course.save()
+        return True
+    except (Course.DoesNotExist, ValidationError):
+        return False
 
-def edit_student(username, student):
-    course = Course.objects.get(id_school=student.id_school, code=student.course)
-    course.students[find(course.students, lambda s: s['username'] == username)] = {
-        'firstname': student.firstname,
-        'lastname': student.lastname,
-        'username': student.username,
-    }
-    course.save()
+def edit_student(id_school, course_code, username, student):
+    try:
+        course = Course.objects.get(id_school=id_school, code=course_code)
+        course.students[find(course.students, lambda p: p['username'] == username)] = {
+            'firstname': student.firstname,
+            'lastname': student.lastname,
+            'username': student.username,
+            'photo': student.photo,
+        }
+        course.save()
+        return True
+    except (Course.DoesNotExist, ValidationError):
+        return False
 
-# def del_student(student):
-#     course = Course.objects.get(id_school=student.id_school, code=student.course)
-#     course.students.pop(find(course.students, lambda s: s['username'] == student.username))
-#     course.save()
-    
-def del_student(course_code, student):
-    course = Course.objects.get(id_school=student.id_school, code=course_code)
-    course.students.pop(find(course.students, lambda s: s['username'] == student.username))
-    course.save()
+def del_student(id_school, course_code, username):
+    try:
+        course = Course.objects.get(id_school=id_school, code=course_code)
+        course.students.pop(find(course.students, lambda p: p['username'] == username))
+        course.save()
+        return True
+    except (Course.DoesNotExist, ValidationError):
+        return False
     
 # Professor
 def add_professor(id_school, course_code, prof):
@@ -145,7 +154,7 @@ def add_professor(id_school, course_code, prof):
             'firstname': prof.firstname,
             'lastname': prof.lastname,
             'username': prof.username,
-            'department': prof.department,
+            'photo': prof.photo,
         })
         course.save()
         return True
@@ -159,7 +168,7 @@ def edit_professor(id_school, course_code, username, prof):
             'firstname': prof.firstname,
             'lastname': prof.lastname,
             'username': prof.username,
-            'department': prof.department,
+            'photo': prof.photo,
         }
         course.save()
         return True
@@ -175,20 +184,20 @@ def del_professor(id_school, course_code, username):
     except (Course.DoesNotExist, ValidationError):
         return False
 
-def update_professors(id_school, course_code):
-    try:
-        profs = list(filter(lambda x: (
-            # course_code in map(lambda c: c['code'], x.courses)
-            course_code in [c['code'] for c in x.courses]
-        ), Professor.objects(id_school=id_school)))
+# def update_professors(id_school, course_code):
+#     try:
+#         profs = list(filter(lambda x: (
+#             # course_code in map(lambda c: c['code'], x.courses)
+#             course_code in [c['code'] for c in x.courses]
+#         ), Professor.objects(id_school=id_school)))
         
-        return Course.objects.get(id_school=id_school).modify(
-            professors=list(map(lambda x: {
-                'username': x.username,
-                'firstname': x.firstname,
-                'lastname': x.lastname,
-                'department': x.department,
-            }, profs))
-        )
-    except (Course.DoesNotExist, Professor.DoesNotExist):
-        return False
+#         return Course.objects.get(id_school=id_school).modify(
+#             professors=list(map(lambda x: {
+#                 'username': x.username,
+#                 'firstname': x.firstname,
+#                 'lastname': x.lastname,
+#                 'photo': x.photo,
+#             }, profs))
+#         )
+#     except (Course.DoesNotExist, Professor.DoesNotExist):
+#         return False

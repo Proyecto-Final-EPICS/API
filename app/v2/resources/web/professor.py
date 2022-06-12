@@ -19,7 +19,6 @@ def post_professor(content):
         User.objects.get(username=content['username'])
         return {'msg': 'User already exists'}
     except User.DoesNotExist:
-
         School.objects.get(id_school=content['id_school'])
         
         user = User(
