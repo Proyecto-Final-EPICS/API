@@ -10,6 +10,9 @@ from . import school, course
 def get_school_students(id_school):
     return Student.objects(id_school=id_school).to_json()
 
+def get_course_students(id_school, course_code):
+    return Student.objects(id_school=id_school, course=course_code).to_json()
+
 # def get_school_student(id_school, username):
 #     return Student.objects.get(username=username)
 
@@ -105,15 +108,15 @@ def put_student(username, content):
         
         course_end = student.course
         if course_start != course_end:
-            course.del_student_from_course(student.id_school, course_start, {
+            course.del_student_from_course(student.id_school, course_start, username)
+            course.add_student_to_course(student.id_school, course_end, {
                 'firstname': student.firstname,
                 'lastname': student.lastname,
                 'username': student.username,
                 'photo': student.photo,
             })
-            course.add_student_to_course(student.id_school, course_end, student)
         else:
-            course.edit_student_from_course(student.id_school, course_start, student.username, {
+            course.edit_student_from_course(student.id_school, course_start, username, {
                 'firstname': student.firstname,
                 'lastname': student.lastname,
                 'username': student.username,
