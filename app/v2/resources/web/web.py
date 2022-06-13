@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from . import course, game, user, school, professor, admin, rector, student
+from . import course, game, user, school, professor, admin, rector, student, session_game as session
 
 app = Blueprint('web', __name__)
 
@@ -181,3 +181,10 @@ def get_games_from_course(id_school, code_course):
 @app.route('/school/<id_school>/course/<code_course>/game', methods=['DELETE'])
 def delete_games_from_course(id_school, code_course):
     return game.delete_games_from_course(id_school, code_course)
+
+
+# SESSION ***********************************************
+
+@app.route('/school/<id_school>/game/<id_game>/session')
+def get_game_sessions(id_school, id_game):
+    return session.get_game_sessions(int(id_school), id_game)
