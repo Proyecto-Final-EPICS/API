@@ -125,16 +125,16 @@ def put_professor(username, content):
             courses_end = set([course['code'] for course in prof.courses])
 
             for course_ in list(courses_start.difference(courses_end)):
-                course.del_professor_from_course(prof.id_school, course_, prof.username)
+                course.del_professor_from_course(prof.id_school, course_, username)
             
             for course_ in list(courses_end.difference(courses_start)):
                 course.add_professor_to_course(prof.id_school, course_, prof_course)
 
             for course_ in list(courses_end.intersection(courses_start)):
-                course.edit_professor_from_course(prof.id_school, course_, prof.username, prof_course)
+                course.edit_professor_from_course(prof.id_school, course_, username, prof_course)
         else:
             for course_ in prof.courses:
-                course.edit_professor_from_course(prof.id_school, course_['code'], prof.username, prof_course)
+                course.edit_professor_from_course(prof.id_school, course_['code'], username, prof_course)
         
         return {'msg': 'Professor edited'}
 

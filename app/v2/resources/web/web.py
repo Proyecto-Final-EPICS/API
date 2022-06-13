@@ -3,9 +3,8 @@ from . import course, game, user, school, professor, admin, rector, student, ses
 
 app = Blueprint('web', __name__)
 
-@app.route('/', methods=['GET'])
+@app.route('/ping', methods=['GET'])
 def root():
-    print('************************************************')
     return {'msg': 'Welcome to /v2.0/web'}
 
 # USER ***********************************************
@@ -91,6 +90,10 @@ def delete_student(username):
 @app.route('/school/<id_school>/student', methods=['GET'])
 def get_school_students(id_school):
     return student.get_school_students(id_school)
+
+@app.route('/school/<id_school>/course/<course_code>/student', methods=['GET'])
+def get_course_students(id_school, course_code):
+    return student.get_course_students(id_school, course_code)
 
 # @app.route('/school/<id_school>/student/<username>', methods=['GET'])
 # def get_school_student(id_school, username):
@@ -233,6 +236,6 @@ def delete_game(id_school, game_code):
 
 # SESSION ***********************************************
 
-@app.route('/school/<id_school>/game/<id_game>/session')
-def get_game_sessions(id_school, id_game):
-    return session.get_game_sessions(int(id_school), id_game)
+@app.route('/school/<id_school>/game/<game_code>/session')
+def get_game_sessions(id_school, game_code):
+    return session.get_game_sessions(int(id_school), game_code)

@@ -95,7 +95,7 @@ def delete_game(id_school, game_code):
         courses = Course.objects(id_school=id_school)
         for course_ in courses:
             course.del_game(course_, game_code)
-
+        
         return {'msg': 'Game deleted'}
     except Game.DoesNotExist:
         return {'msg': 'Game does not exist'}, 404
