@@ -33,7 +33,7 @@ def post_progress(content):
 
     # verify if the module is in the game
     try:
-        game.modules.get(moduleId=module['idgame'])
+        game.modules.get(name=module['namegame'])
     except DoesNotExist:
         return jsonify({'error': 'Module does not exist'}), 400
 
