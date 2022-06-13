@@ -19,46 +19,54 @@ def post_rector(content):
         User.objects.get(username=content['username'])
         return {'msg': 'User already exists'}
     except User.DoesNotExist:
-        user = User(
-            username=content['username'], password=content['password'], firstname=content['firstname'],
-            lastname=content['lastname'], id_school=content['id_school'], role='rector'
-        )
-        
-        rec = Rector(
-            username=content['username'], firstname=content['firstname'], lastname=content['lastname'], 
-            id_school=content['id_school'], identity_doc=content['identity_doc'], 
-            birth_date=isoparse(content['birth_date']), gender=content.get('gender', ''),
-            phone=content.get('phone', {}), email=content.get('email', ''),
-            photo=content.get('photo', 'https://randomuser.me/api/portraits/{}men/{}.jpg'.format(
-                'wo' if random() < 0.5 else '',
-                randrange(0, 100)
-            )),
-        )
-        rec.age = age_from_birth_date(rec.birth_date)
-        
         try:
+            school_ = School.objects.get(id_school=content['id_school'])
+            
+            user = User(
+                username=content['username'], password=content['password'], firstname=content['firstname'],
+                lastname=content['lastname'], id_school=content['id_school'], role='rector'
+            )
+            
+            content.pop('password')
+            rec = Rector(**content)
+
+            rec.birth_date = isoparse(rec.birth_date)
+            rec.age = age_from_birth_date(rec.birth_date)
+        
             user.validate()
             rec.validate()
-
             rec.save()
             user.save()
             
-            school.add_rector(rec)
+            school.add_rector(school_, {
+                'firstname': rec.firstname,
+                'lastname': rec.lastname,
+                'username': rec.username,
+                'photo': rec.photo,
+            })
+            return {'msg': 'Rector created'}
+
         except ValidationError:
             return {'msg': 'Invalid user data'}
         except NotUniqueError:
             return {'msg': 'Some fields required as unique are repeated'}
         except School.DoesNotExist:
-            return {'msg': 'Unexpected error'}
-        
-        return jsonify(rec)
-    except Rector.DoesNotExist:
-        return {'msg': 'Unexpected error'}
+            return {'msg': 'Invalid school'}
+        except KeyError:
+            return {'msg': 'Required fields not provided'}
+        except Exception as e:
+            return {'msg': 'Exception', 'err': str(e)}
+
     except KeyError:
         return {'msg': 'Required fields not provided'}
+    except Exception as e:
+        return {'msg': 'Exception', 'err': str(e)}
 
 def put_rector(username, content):
     try:
+        content.pop('role', None)
+        content.pop('id_school', None)
+        
         user = User.objects.get(username=username)
         rec = Rector.objects.get(username=username)
 
@@ -72,11 +80,16 @@ def put_rector(username, content):
             content['age'] = age_from_birth_date(content['birth_date'])
 
         done = (rec.modify(**content) if content != {} else True) and (user.modify(**user_mod) if user_mod != {} else True)
+        if not done: return {'msg': 'The database doesn\'t match the query'}
 
-        if done:
-            school.edit_rector(username, rec)
-            return jsonify(rec)
-        return {'msg': 'The database doesn\'t match the query'}
+        school.edit_rector_from_school(rec.id_school, username, {
+            'firstname': rec.firstname,
+            'lastname': rec.lastname,
+            'username': rec.username,
+            'photo': rec.photo,
+        })
+
+        return {'msg': 'Rector edited'}
 
     except User.DoesNotExist:
         return {'msg': 'User does not exist'}
@@ -86,6 +99,8 @@ def put_rector(username, content):
         return {'msg': 'Some fields required as unique are repeated'}
     except KeyError: 
         return {'msg': 'Required fields not provided'}
+    except Exception as e:
+        return {'msg': 'Exception', 'err': str(e)}
 
 def delete_rector(username):
     try:
@@ -95,8 +110,28 @@ def delete_rector(username):
         user.delete()
         rec.delete()
 
-        school.del_rector(rec)
-        return get_school_rectors(rec.id_school)
+        school.del_rector_from_school(rec.id_school, username)
+        return {'msg': 'Rector deleted succesfully'}
 
-    except User.DoesNotExist: return {'msg': 'Non existing user'}
-    except Rector.DoesNotExist: return {'msg': 'Unexpected error'}
+    except User.DoesNotExist:
+        return {'msg': 'Non existing user'}
+    except Rector.DoesNotExist:
+        return {'msg': 'Unexpected error'}
+    except Exception as e:
+        return {'msg': 'Exception', 'err': str(e)}
+
+# FIELDS
+# School
+def edit_id_school_from_rector(username, id_school):
+    try:
+        return edit_id_school(Rector.objects.get(username=username), id_school)
+    except Rector.DoesNotExist:
+        return False
+
+def edit_id_school(rec, id_school):
+    try:
+        rec.id_school = id_school
+        rec.save()
+        return True
+    except ValidationError:
+        return False

@@ -122,12 +122,12 @@ def put_school(id_school):
 
 # COURSE ***********************************************
 @app.route('/school/<id_school>/course')
-def get_courses(id_school):
-    return course.get_courses(id_school)
+def get_school_courses(id_school):
+    return course.get_school_courses(id_school)
 
 @app.route('/school/<id_school>/course/<code_course>')
-def get_course(id_school, code_course):
-    return course.get_course(id_school, code_course)
+def get_school_course(id_school, code_course):
+    return course.get_school_course(id_school, code_course)
 
 @app.route('/school/<id_school>/course', methods=['POST'])
 def post_course(id_school):
@@ -143,34 +143,34 @@ def put_course(id_school, code_course):
 
 # GAME ***********************************************
 @app.route('/school/<id_school>/game')
-def get_games(id_school):
-    return game.get_games(id_school)
+def get_school_games(id_school):
+    return game.get_school_games(id_school)
 
-@app.route('/school/<id_school>/game/<code_game>')
-def get_game(id_school, code_game):
-    return game.get_game(id_school, code_game)
+@app.route('/school/<id_school>/game/<game_code>')
+def get_school_game(id_school, game_code):
+    return game.get_school_game(id_school, game_code)
 
 @app.route('/school/<id_school>/game', methods=['POST'])
 def post_game(id_school):
     return game.post_game(id_school, request.get_json())
 
-@app.route('/school/<id_school>/game/<code_game>', methods=['DELETE'])
-def delete_game(id_school, code_course, code_game):
-    return game.delete_game(id_school, code_course, code_game)
+@app.route('/school/<id_school>/course/<code_course>/game/<game_code>', methods=['PUT'])
+def put_game(id_school, game_code):
+    return game.put_game(id_school, game_code, request.get_json())
 
-@app.route('/school/<id_school>/course/<code_course>/game/<code_game>', methods=['PUT'])
-def put_game(id_school, code_game):
-    return game.put_game(id_school, code_game, request.get_json())
+@app.route('/school/<id_school>/game/<game_code>', methods=['DELETE'])
+def delete_game(id_school, code_course, game_code):
+    return game.delete_game(id_school, code_course, game_code)
 
 # add an existing game into a course with game id
-@app.route('/school/<id_school>/course/<code_course>/game/<code_game>', methods=['POST'])
-def post_game_into_course(id_school, code_course, code_game):
-    return game.post_game_into_course(id_school, code_course, code_game)
+@app.route('/school/<id_school>/course/<code_course>/game/<game_code>', methods=['POST'])
+def post_game_into_course(id_school, code_course, game_code):
+    return game.post_game_into_course(id_school, code_course, game_code)
 
 # delete an existing game from a course with game id
-@app.route('/school/<id_school>/course/<code_course>/game/<code_game>', methods=['DELETE'])
-def delete_game_from_course(id_school, code_course, code_game):
-    return game.delete_game_from_course(id_school, code_course, code_game)
+@app.route('/school/<id_school>/course/<code_course>/game/<game_code>', methods=['DELETE'])
+def delete_game_from_course(id_school, code_course, game_code):
+    return game.delete_game_from_course(id_school, code_course, game_code)
 
 # get all games from a course with course id
 @app.route('/school/<id_school>/course/<code_course>/game', methods=['GET'])
