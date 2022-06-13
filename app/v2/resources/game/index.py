@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from v2.models import Game, Student, SessionGame, School
 from . import session
+from v2.common import create_resume_modules
 
 app = Blueprint('game', __name__)
 
@@ -14,20 +15,24 @@ def logStudent():
     # get the School from the game and check if the user is in the school
     try:
         game = Game.objects.get(name=game_name)
-        school = game.id_school
-        student = Student.objects.get(username=username, id_school=school)
+        student = Student.objects.get(username=username)
+        school = student.id_school
 
         # check if the student have a Session on that Game
         try:
             print()
             session = SessionGame.objects.get(user=username, game_code= game.code)
-            return jsonify({'username':username, 'score':session.resume.score, 'lastlevel': '0', 'win':'False'})
+            return jsonify({'username':username, 'score':session.resume.score, 'lastlevel': '0', 'win':'False', 'id_sesion': 0})
         except SessionGame.DoesNotExist:
             # create a new Session for the student  on that game
             print('Creating a new Session for the student on that game')
             session = SessionGame(user= username, game_code= game.code, id_course=student.course, id_school=school)
+            
+            #create the resume modules of the session
+            create_resume_modules(session, game)
+
             session.save()
-            return jsonify({'username': username, 'score': '0', 'lastlevel': '0', 'win': 'False'})
+            return jsonify({'username': username, 'score': '0', 'lastlevel': '0', 'win': 'False',  'id_sesion': 0})
     except Exception as e:
         print('error', e)
         return jsonify({'username': username, 'score': '0', 'lastlevel': '0', 'win': 'False'})
