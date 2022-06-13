@@ -23,7 +23,7 @@ def get_school_game(id_school, game_code):
         return {'msg': 'Game does not exist'}, 404
 
 # post a game and add it to a course
-@school_member_required
+# @school_member_required
 def post_game(id_school, content):
     try:
         Game.objects.get(id_school=id_school, code=content['code'])
@@ -31,7 +31,7 @@ def post_game(id_school, content):
     except Game.DoesNotExist:
         try:
             school_ = School.objects.get(id_school=id_school)
-            game = Game(id_school=id_school, **content)
+            game = Game(**content)
 
             game.validate()
             game.save()
@@ -53,8 +53,8 @@ def post_game(id_school, content):
             
     except KeyError as e: 
         return {'msg': 'Required fields not provided', 'err': str(e)}
-    except Exception as e:
-        return {'msg': 'Exception', 'err': str(e)}, 500
+    # except Exception as e:
+    #     return {'msg': 'Exception', 'err': str(e)}, 500
 
 # update a game from a school's course
 @school_member_required

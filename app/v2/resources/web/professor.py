@@ -10,9 +10,12 @@ from . import school, course
 def get_school_professors(id_school):
     return Professor.objects(id_school=id_school).to_json()
 
-# def get_school_professor(id_school, username):
-#     return Professor.objects.get(username=username)
-
+def get_school_professor(id_school, username):
+    try:
+        return jsonify(Professor.objects.get(username=username))
+    except Professor.DoesNotExist:
+        return {'msg': 'Professor does not exist'}
+    
 # @role_permission_required('>')
 def post_professor(content):
     try:
@@ -36,7 +39,7 @@ def post_professor(content):
             if content.get('courses', None):
                 def get_course(course_code):
                     course = Course.objects.get(id_school=prof.id_school, code=course_code)
-                    return {'code': course.code, 'name': course.name}
+                    return {'code': course.code, 'name': course.name, 'level': course.level}
                 prof.courses = list(map(get_course, content['courses']))
 
             user.validate()
@@ -98,7 +101,7 @@ def put_professor(username, content):
         if content.get('courses', None):
             def get_course(course_code):
                 course = Course.objects.get(id_school=prof.id_school, code=course_code)
-                return {'code': course.code, 'name': course.name}
+                return {'code': course.code, 'name': course.name, 'level': course.level}
             content['courses'] = list(map(get_course, content['courses']))
 
         done = (prof.modify(**content) if content != {} else True) and (user.modify(**user_mod) if user_mod != {} else True)
