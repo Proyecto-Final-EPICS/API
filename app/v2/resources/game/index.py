@@ -27,9 +27,6 @@ def logStudent():
             # create a new Session for the student  on that game
             print('Creating a new Session for the student on that game')
             session = SessionGame(user= username, game_code= game.code, id_course=student.course, id_school=school)
-            
-            #create the resume modules of the session
-            create_resume_modules(session, game)
 
             session.save()
             return jsonify({'username': username, 'score': '0', 'lastlevel': '0', 'win': 'False',  'id_sesion': 0})

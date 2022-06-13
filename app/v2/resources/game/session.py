@@ -31,6 +31,12 @@ def post_progress(content):
     if not game:
         return jsonify({'error': 'Error in the request a'})
 
+    # verify if the module is in the game
+    try:
+        game.modules.get(moduleId=module['idgame'])
+    except DoesNotExist:
+        return jsonify({'error': 'Module does not exist'}), 400
+
     # calculate the score
     try:
         score = calculate_module_score(module['pcorrectas'], get_num_questions_module(game, module['namegame']))
@@ -70,7 +76,7 @@ def post_progress(content):
         # session.modules.save()
 
         # update the resume of the session_game
-        calculate_resume(session_game.resume, session)
+        calculate_resume(session_game.resume, session, game)
         # save the session_list
         session_list.save()
         # save the session_game
@@ -85,7 +91,7 @@ def post_progress(content):
     return "suerte con eso"
 
 
-def calculate_resume(resume, last_session):
+def calculate_resume(resume: Resume, last_session: Session, game: Game) -> None:
     # calculate the resume of the session_game
     # update the modules of the resume
     print(last_session)

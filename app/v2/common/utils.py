@@ -53,20 +53,6 @@ def age_from_birth_date(birth_date):
     today = date.today()
     return today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
 
-def create_resume_modules(session_game: SessionGame, game: Game):
-    """
-    Create the resume modules.
-    for each module in the Game create a new ResumeModule
-
-    :param session_game: The session game.
-    """
-
-    for module in game.modules:
-        session_game.resume.modules.create(moduleId=module.name)
-    
-    session_game.save()
-    
-
 def get_schoolId_from_schoolName(schoolName: str) -> str:
     """
     Get the schoolId from a school name.
