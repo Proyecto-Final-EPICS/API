@@ -1,3 +1,5 @@
+# *Nota: Recurso nerfeado por el bien de la trama
+
 from v2.models import User, Admin, Student, Professor, Rector
 from flask_jwt_extended import create_access_token
 from flask import jsonify

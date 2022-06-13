@@ -10,10 +10,10 @@ def auth_required(l: list):
         def decorator(*args, **kwargs):
             verify_jwt_in_request()
             claims = get_jwt()
-            if claims["role"] in l:
+            if claims['role'] in l:
                 return fn(*args, **kwargs)
             else:
-                return {"msg": "You are not authorized to access this resource"}, 403
+                return {'msg': 'You are not authorized to access this resource'}, 403
 
         return decorator
 
@@ -28,13 +28,13 @@ def self_allowed():
             verify_jwt_in_request()
             claims = get_jwt()
 
-            username_claims = User.objects.get(username=claims["sub"]["username"])
-            username_content = User.objects.get(username=content["username"])
+            username_claims = User.objects.get(username=claims['sub']['username'])
+            username_content = User.objects.get(username=content['username'])
 
             if username_claims == username_content:
                 return fn(content, *args, **kwargs)
             else:
-                return {"msg": "Authentication error"}, 403
+                return {'msg': 'Authentication error'}, 403
 
         return decorator
 
@@ -50,29 +50,29 @@ def role_permission_required(rel):
                 verify_jwt_in_request()
                 claims = get_jwt()
 
-                role_claims = Role.objects.get(name=claims["sub"]["role"])
-                role_content = Role.objects.get(name=content["role"])
+                role_claims = Role.objects.get(name=claims['sub']['role'])
+                role_content = Role.objects.get(name=content['role'])
 
-                if rel == ">":
+                if rel == '>':
                     if role_claims.permission_level < role_content.permission_level:
                         return fn(content, *args, **kwargs)
                     else:
                         return {
-                            "msg": "You are not authorized to access this resource"
+                            'msg': 'You are not authorized to access this resource'
                         }, 403
 
-                elif rel == ">=":
+                elif rel == '>=':
                     if role_claims.permission_level <= role_content.permission_level:
                         return fn(content, *args, **kwargs)
                     else:
                         return {
-                            "msg": "You are not authorized to access this resource"
+                            'msg': 'You are not authorized to access this resource'
                         }, 403
 
             except KeyError:
-                return {"msg": "Token's role and/or content's role not provided"}
+                return {'msg': 'Token\'s role and/or content\'s role not provided'}
             except Role.DoesNotExist:
-                return {"msg": "Invalid role"}
+                return {'msg': 'Invalid role'}
 
         return decorator
 
@@ -84,10 +84,10 @@ def admin_required(fn):
     def decorator(*args, **kwargs):
         verify_jwt_in_request()
         claims = get_jwt()
-        if claims["sub"]["role"] == "admin":
+        if claims['sub']['role'] == 'admin':
             return fn(*args, **kwargs)
         else:
-            return {"msg": "Admins only!"}, 403
+            return {'msg': 'Admins only!'}, 403
 
     return decorator
 
@@ -97,10 +97,10 @@ def rector_required(fn):
     def decorator(*args, **kwargs):
         verify_jwt_in_request()
         claims = get_jwt()
-        if claims["sub"]["role"] == "rector":
+        if claims['sub']['role'] == 'rector':
             return fn(*args, **kwargs)
         else:
-            return {"msg": "Admins only!"}, 403
+            return {'msg': 'Admins only!'}, 403
 
     return decorator
 
@@ -110,10 +110,11 @@ def rector_or_admin_required(fn):
     def decorator(*args, **kwargs):
         verify_jwt_in_request()
         claims = get_jwt()
-        if claims["sub"]["role"] == "admin" or claims["sub"]["role"] == "rector":
+        print(claims['sub']['role'])
+        if claims['sub']['role'] == 'admin' or claims['sub']['role'] == 'rector':
             return fn(*args, **kwargs)
         else:
-            return {"msg": "Admins or Rectors only!"}, 403
+            return {'msg': 'Admins or Rectors only!'}, 403
 
     return decorator
 
@@ -130,6 +131,6 @@ def school_member_required(fn):
             if user.id_school == id_school:
                 return fn(id_school, *args, **kwargs)
             else:
-                return {'msg': "You are not authorized to access this resource"}, 403
+                return {'msg': 'You are not authorized to access this resource'}, 403
 
     return decorator

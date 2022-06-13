@@ -1,4 +1,6 @@
+from email.policy import default
 import mongoengine as me
+from random import random, randrange
 
 class Professor(me.Document):
     username = me.StringField(required=True, unique=True)
@@ -11,7 +13,10 @@ class Professor(me.Document):
     phone = me.DictField()
     gender = me.StringField()
     age = me.IntField()
-    photo = me.URLField()
+    photo = me.URLField(default='https://randomuser.me/api/portraits/{}men/{}.jpg'.format(
+        'wo' if random() < 0.5 else '',
+        randrange(0, 100)
+    ))
     department = me.StringField()
     courses = me.ListField(me.DictField())
     meta = {'collection': 'professors'}
