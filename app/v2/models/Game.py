@@ -1,10 +1,8 @@
-from email.policy import default
 import mongoengine as me
 
 class GameModule(me.EmbeddedDocument):
     name = me.StringField(required=True)
     num_questions = me.IntField(required=True)
-
 
 class Game(me.Document):
     code = me.StringField(required=True, unique_with='id_school')

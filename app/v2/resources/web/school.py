@@ -11,7 +11,7 @@ def get_schools():
     
 def get_school(id_school):
     try:
-        return School.objects.get(id_school=id_school).to_json()
+        return jsonify(School.objects.get(id_school=id_school))
     except School.DoesNotExist:
         return {'msg': 'School does not exist'} 
 

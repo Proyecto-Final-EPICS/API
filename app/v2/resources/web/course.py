@@ -124,98 +124,98 @@ def add_student_to_course(id_school, course_code, student):
     try:
         return add_student(Course.objects.get(id_school=id_school, code=course_code), student)
     except Course.DoesNotExist:
-        return False
+        return {'msg': 'Validation error'}
 
 def add_student(course, student):
     try:
         course.students.append(student)
         course.save()
-        return True
+        return {'msg': 'Operation successful'}
     except ValidationError:
-        return False
+        return {'msg': 'Validation error'}
 
 def edit_student_from_course(id_school, course_code, username, student):
     try:
         return edit_student(Course.objects.get(id_school=id_school, code=course_code), username, student)
     except Course.DoesNotExist:
-        return False
+        return {'msg': 'Validation error'}
 
 def edit_student(course, username, student):
     try:
         i = find(course.students, lambda p: p['username'] == username)
-        if i == -1: return False
+        if i == -1: return {'msg': 'Validation error'}
 
         course.students[i] = student
         course.save()
-        return True
+        return {'msg': 'Operation successful'}
     except ValidationError:
-        return False
+        return {'msg': 'Validation error'}
 
 def del_student_from_course(id_school, course_code, username):
     try:
         return del_student(Course.objects.get(id_school=id_school, code=course_code), username)
     except Course.DoesNotExist:
-        return False
+        return {'msg': 'Validation error'}
 
 def del_student(course, username):
     try:
         i = find(course.students, lambda p: p['username'] == username)
-        if i == -1: return False
+        if i == -1: return {'msg': 'Validation error'}
 
         course.students.pop(i)
         course.save()
-        return True
+        return {'msg': 'Operation successful'}
     except ValidationError:
-        return False
+        return {'msg': 'Validation error'}
 
 # Professor
 def add_professor_to_course(id_school, course_code, prof):
     try:
         return add_professor(Course.objects.get(id_school=id_school, code=course_code), prof)
     except Course.DoesNotExist:
-        return False
+        return {'msg': 'Validation error'}
 
 def add_professor(course, prof):
     try:
         course.professors.append(prof)
         course.save()
-        return True
+        return {'msg': 'Operation successful'}
     except ValidationError:
-        return False
+        return {'msg': 'Validation error'}
 
 def edit_professor_from_course(id_school, course_code, username, prof):
     try:
         return edit_professor(Course.objects.get(id_school=id_school, code=course_code), username, prof)
     except (Course.DoesNotExist, ValidationError):
-        return False
+        return {'msg': 'Validation error'}
 
 def edit_professor(course, username, prof):
     try:
         i = find(course.professors, lambda p: p['username'] == username)
-        if i == -1: return False
+        if i == -1: return {'msg': 'Validation error'}
 
         course.professors[i] = prof
         course.save()
-        return True
+        return {'msg': 'Operation successful'}
     except ValidationError:
-        return False
+        return {'msg': 'Validation error'}
 
 def del_professor_from_course(id_school, course_code, username):
     try:
         return del_professor(Course.objects.get(id_school=id_school, code=course_code), username)
     except Course.DoesNotExist:
-        return False
+        return {'msg': 'Validation error'}
 
 def del_professor(course, username):
     try:
         i = find(course.professors, lambda p: p['username'] == username)
-        if i == -1: return False
+        if i == -1: return {'msg': 'Validation error'}
 
         course.professors.pop(i)
         course.save()
-        return True
+        return {'msg': 'Operation successful'}
     except ValidationError:
-        return False
+        return {'msg': 'Validation error'}
 
 # def update_professors(id_school, course_code):
 #     try:
@@ -232,68 +232,96 @@ def del_professor(course, username):
 #             }, profs))
 #         )
 #     except (Course.DoesNotExist, Professor.DoesNotExist):
-#         return False
+#         return {'msg': 'Validation error'}
 
 # Game
 def add_game_to_course(id_school, course_code, game):
     try:
         return add_game(Course.objects.get(id_school=id_school, code=course_code), game)
     except Course.DoesNotExist:
-        return False
+        return {'msg': 'Validation error'}
 
 def add_game(course, game):
     try:
         course.games.append(game)
         course.save()
-        return True
+        return {'msg': 'Operation successful'}
     except ValidationError:
-        return False
+        return {'msg': 'Validation error'}
+
+def add_games_to_course(id_school, course_code, games):
+    try:
+        return add_games(Course.objects.get(id_school=id_school, code=course_code), games)
+    except Course.DoesNotExist:
+        return {'msg': 'Validation error'}
+
+def add_games(course, games):
+    try:
+        course.games = course.games + games
+        course.save()
+        return {'msg': 'Operation successful'}
+    except ValidationError:
+        return {'msg': 'Validation error'}
 
 def edit_game_from_course(id_school, course_code, game_code, game):
     try:
         return edit_game(Course.objects.get(id_school=id_school, code=course_code), game_code, game)
     except Course.DoesNotExist:
-        return False
+        return {'msg': 'Validation error'}
 
 def edit_game(course, game_code, game):
     try:
         i = find(course.games, lambda p: p['code'] == game_code)
-        if i == -1: return False
+        if i == -1: return {'msg': 'Validation error'}
 
         course.games[i] = game
         course.save()
-        return True
+        return {'msg': 'Operation successful'}
     except ValidationError:
-        return False
+        return {'msg': 'Validation error'}
 
 def del_game_from_course(id_school, course_code, game_code):
     try:
         return del_game(Course.objects.get(id_school=id_school, code=course_code), game_code)
     except Course.DoesNotExist:
-        return False
+        return {'msg': 'Validation error'}
 
 def del_game(course, game_code):
     try:
         i = find(course.games, lambda p: p['code'] == game_code)
-        if i == -1: return False
+        if i == -1: return {'msg': 'Validation error'}
 
         course.games.pop(i)
         course.save()
-        return True
+        return {'msg': 'Operation successful'}
     except ValidationError:
-        return False
+        return {'msg': 'Validation error'}
+
+def del_games_from_course(id_school, course_code, games_code):
+    try:
+        return del_games(Course.objects.get(id_school=id_school, code=course_code), games_code)
+    except Course.DoesNotExist:
+        return {'msg': 'Validation error'}
+
+def del_games(course, games_code):
+    try:
+        course.games = [g for g in course.games if g['code'] not in games_code]
+        course.save()
+        return {'msg': 'Operation successful'}
+    except ValidationError:
+        return {'msg': 'Validation error'}
 
 # School
 def edit_id_school_from_course(id_school, course_code, id_school_new):
     try:
         return edit_id_school(Course.objects.get(id_school=id_school, course=course_code), id_school_new)
     except Course.DoesNotExist:
-        return False
+        return {'msg': 'Validation error'}
 
 def edit_id_school(course, id_school_new):
     try:
         course.id_school = id_school_new
         course.save()
-        return True
+        return {'msg': 'Operation successful'}
     except ValidationError:
-        return False
+        return {'msg': 'Validation error'}
