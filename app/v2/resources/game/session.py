@@ -138,7 +138,7 @@ def check_request(student, appname: str) -> Optional[Game]:
         game = Game.objects.get(name=appname, id_school=id_school)
 
         # if the game is 'presentacion' and the school is 'Test-School' return True
-        if appname == 'presentacion' and school == 'School_1':
+        if school == 'School_1':
             return game
 
         student = Student.objects.get(username=username)

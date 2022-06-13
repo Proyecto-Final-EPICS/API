@@ -20,8 +20,8 @@ def logStudent():
         # check if the student have a Session on that Game
         try:
             print()
-            session = SessionGame.objects.get(user=username, game_code= game.code)
-            return jsonify({'username':username, 'score':session.resume.score, 'lastlevel': '0', 'win':'False', 'id_sesion': 0})
+            session:SessionGame = SessionGame.objects.get(user=username, game_code= game.code)
+            return jsonify({'username':username, 'score':session.resume.score, 'lastlevel': '0', 'win':'False', 'id_sesion': session.sessions.count()})
         except SessionGame.DoesNotExist:
             # create a new Session for the student  on that game
             print('Creating a new Session for the student on that game')
@@ -31,7 +31,7 @@ def logStudent():
             return jsonify({'username': username, 'score': '0', 'lastlevel': '0', 'win': 'False',  'id_sesion': 0})
     except Exception as e:
         print('error', e)
-        return jsonify({'username': username, 'score': '0', 'lastlevel': '0', 'win': 'False'})
+        return jsonify({'username': None, 'score': '0', 'lastlevel': '0', 'win': 'False'})
     
 # get schools and send the list of schools to the client in format [{'name': 'school_name', 'code': 'school_code'}]
 @app.route('/schools', methods=['GET'])
