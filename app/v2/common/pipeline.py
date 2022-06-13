@@ -39,7 +39,7 @@ def get_pipeline(id_school, id_game):
             "first_name": {"$arrayElemAt": ["$user_info.firstname", 0]},
             "last_name": {"$arrayElemAt": ["$user_info.lastname", 0]}
         },
-        "game": {
+        "games": [{
             "code": "$game_code",
             "name": "$game_code",
             "score": "$sessions.score",
@@ -57,6 +57,6 @@ def get_pipeline(id_school, id_game):
                     }
                 }
             }
-        }
+        }]
     }}
 ]
