@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
 from v2.models import Game, Student, SessionGame, School
 from . import session
-from v2.common import create_resume_modules
 
 app = Blueprint('game', __name__)
 

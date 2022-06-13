@@ -12,21 +12,6 @@ def calculate_module_score(numAciertos, numPreguntas):
     """
     return (numAciertos * 100) / numPreguntas
 
-def calculate_score(resume: Resume) -> float:
-    """
-    Calculate the score of a resume.
-    """
-    numModules = len(resume.modules)
-    # calculate the average score of the modules
-    averageScore = 0
-    for module in resume.modules:
-        averageScore += module.score
-    averageScore /= numModules
-    
-    return averageScore
-    
-    
-
 def find(lst: List[Any], key: Callable[[Any], bool]) -> int:
     """
     Find the index of the first element in a list that satisfies a given condition.
