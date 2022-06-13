@@ -1,10 +1,8 @@
-from email.policy import default
 import mongoengine as me
 
 class GameModule(me.EmbeddedDocument):
     name = me.StringField(required=True)
     num_questions = me.IntField(required=True)
-
 
 class Game(me.Document):
     code = me.StringField(required=True, unique_with='id_school')
@@ -18,5 +16,4 @@ class Game(me.Document):
     logo = me.URLField(default='https://cdn.pixabay.com/photo/2016/12/23/07/00/game-1926906_960_720.png')
     devs = me.ListField(me.DictField(), default=list)
     modules = me.EmbeddedDocumentListField(GameModule, default=list)
-
     meta = {'collection': 'games'}
