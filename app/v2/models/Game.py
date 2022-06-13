@@ -14,6 +14,6 @@ class Game(me.Document):
     topic = me.StringField()
     launch_date = me.DateField()
     logo = me.URLField(default='https://cdn.pixabay.com/photo/2016/12/23/07/00/game-1926906_960_720.png')
-    devs = me.ListField(me.DictField(), default=list)
     modules = me.EmbeddedDocumentListField(GameModule, default=list)
+    devs = me.ListField(me.DictField(), default=list)
     meta = {'collection': 'games'}

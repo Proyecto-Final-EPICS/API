@@ -31,6 +31,12 @@ def post_progress(content):
     if not game:
         return jsonify({'error': 'Error in the request a'})
 
+    # verify if the module is in the game
+    try:
+        game.modules.get(name=module['namegame'])
+    except DoesNotExist:
+        return jsonify({'error': 'Module does not exist'}), 400
+
     # calculate the score
     try:
         score = calculate_module_score(module['pcorrectas'], get_num_questions_module(game, module['namegame']))
@@ -63,14 +69,18 @@ def post_progress(content):
             session_module.aproved = score>=60
 
         except DoesNotExist:
-            session.modules.create(moduleId=module['namegame'], score=score, time=time, aproved=score>=60)
+            session_module = session.modules.create(moduleId=module['namegame'], score=score, time=time, aproved=score>=60)
             
 
         # save the session
         # session.modules.save()
 
         # update the resume of the session_game
-        calculate_resume(session_game.resume, session)
+        calculate_resume(session_game.resume, session_module, game)
+
+        # set the session score as the resume score
+        session.score = session_game.resume.score
+
         # save the session_list
         session_list.save()
         # save the session_game
@@ -85,35 +95,32 @@ def post_progress(content):
     return "suerte con eso"
 
 
-def calculate_resume(resume, last_session):
+def calculate_resume(resume: Resume, module: SessionModule, game: Game) -> None:
     # calculate the resume of the session_game
     # update the modules of the resume
-    print(last_session)
-    for module in last_session.modules:
-        try:
-            resume_module = resume.modules.get(moduleId=module.moduleId)
-            # increment the time
-            resume_module.time += module.time
-            resume.time += module.time
-            # set the best score
-            if module.score > resume_module.score:
-                resume_module.score = module.score
-            # set the aproved
-            if module.aproved:
-                resume_module.aproved = module.aproved
-        except DoesNotExist:
-            # resume.modules.create(moduleId=module.moduleId, score=module.score, time=module.time, aproved=module.aproved)
-            raise Exception('SessionModule not found, a mimir')
-    
-    # update the resume
+    print(module)
+    count_modules = game.modules.count()
+    try:
+        resume_module = resume.modules.get(moduleId=module.moduleId)
+        # increment the time
+        resume_module.time += module.time
+        # set the best score
+        if module.score > resume_module.score:
+            resume.score += (module.score - resume_module.score)/count_modules
+            resume_module.score = module.score
 
-    # calculate the score
-    resume.score = calculate_score(resume)
-    # set the same score to the session
-    last_session.score = resume.score
-    # save
-    # resume.save()
-    # last_session.save()
+        # set the aproved
+        if module.aproved:
+            resume_module.aproved = module.aproved
+    except DoesNotExist:
+        # create a new resume_module
+        resume_module = resume.modules.create(moduleId=module.moduleId, score=module.score, time=module.time, aproved=module.aproved)
+        # increment the resume.score
+        resume.score += (module.score/count_modules)
+
+    
+    # update the resume time
+    resume.time += module.time
 
 
 def check_request(student, appname: str) -> Optional[Game]:
