@@ -1,1 +1,0 @@
-[{"_id":{"$oid":"61186f6bbdb06363f8a71f93"},"idSchool":"","schoolName":"NombreColegio","students":[{"studentName":"Nombre","age":"edad","username":"user","password":"haspassword"},{"studentName":"juanito","age":"12","username":"XxJuanitoGODxX","password":"a"},{"studentName":"a","age":"-1","username":"a","password":"a"}],"associatedGames":[{"idGame":"","nameGame":""}]}]

@@ -1,5 +1,5 @@
 #ignora los datos cargados en el volume creado para la bd
-mongo/data/
+#mongo/data/
 
 __pycache__
 .idea
