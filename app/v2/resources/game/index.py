@@ -31,7 +31,7 @@ def logStudent():
             return jsonify({'username': username, 'score': '0', 'lastlevel': '0', 'win': 'False',  'id_sesion': 0})
     except Exception as e:
         print('error', e)
-        return jsonify({'username': None, 'score': '0', 'lastlevel': '0', 'win': 'False'})
+        return jsonify({'username': 'error', 'score': '0', 'lastlevel': '0', 'win': 'False'})
     
 # get schools and send the list of schools to the client in format [{'name': 'school_name', 'code': 'school_code'}]
 @app.route('/schools', methods=['GET'])
